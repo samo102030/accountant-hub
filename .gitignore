@@ -435,9 +435,6 @@ stitch/
 .cursor/
 Vibe Coder _ Solo Full-Stack Developer.md
 
-# Internal agent workflow (remove from repo before final submission if desired)
-docs/slice-reports/
-
 # Secrets & local config
 .env
 .env.*
