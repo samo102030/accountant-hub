@@ -427,3 +427,23 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# --- Accountant Hub ---
+
+# Local-only (never commit)
+stitch/
+.cursor/
+Vibe Coder _ Solo Full-Stack Developer.md
+
+# Secrets & local config
+.env
+.env.*
+!.env.example
+appsettings.Development.json
+**/secrets.json
+
+# Angular / Node
+dist/
+.angular/
+npm-debug.log*
+yarn-error.log*
