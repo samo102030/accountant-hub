@@ -12,6 +12,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Job> Jobs => Set<Job>();
+    public DbSet<Bid> Bids => Set<Bid>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -43,6 +44,23 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
                 .WithMany(c => c.Jobs)
                 .HasForeignKey(j => j.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Bid>(entity =>
+        {
+            entity.HasKey(b => b.Id);
+            entity.Property(b => b.ProposedPrice).HasPrecision(18, 2);
+            entity.Property(b => b.CoverLetter).HasMaxLength(2000).IsRequired();
+            entity.Property(b => b.ExperienceSummary).HasMaxLength(1000).IsRequired();
+            entity.HasIndex(b => new { b.UserId, b.JobId }).IsUnique();
+            entity.HasOne(b => b.Job)
+                .WithMany()
+                .HasForeignKey(b => b.JobId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(b => b.User)
+                .WithMany()
+                .HasForeignKey(b => b.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

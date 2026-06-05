@@ -1,0 +1,142 @@
+<form
+  class="flex flex-col gap-6 rounded-lg border border-border bg-background p-6 shadow-sm md:p-10"
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+>
+  <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+    <div class="flex flex-col gap-2">
+      <label for="proposedPrice" class="text-xs font-semibold uppercase tracking-tight text-on-surface-variant">
+        Proposed Price
+      </label>
+      <div class="relative">
+        <span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-on-surface-variant">$</span>
+        <input
+          id="proposedPrice"
+          type="number"
+          step="0.01"
+          min="0.01"
+          formControlName="proposedPrice"
+          placeholder="0.00"
+          (blur)="formatPriceOnBlur()"
+          class="w-full rounded-lg border border-border bg-background py-3 pl-12 pr-4 text-base focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary"
+        />
+      </div>
+      @if (form.controls.proposedPrice.touched && form.controls.proposedPrice.errors) {
+        <p class="text-xs text-error">Proposed price must be greater than 0.</p>
+      } @else {
+        <p class="text-[11px] text-on-surface-variant">Total amount the client will see including service fees.</p>
+      }
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label for="deliveryDays" class="text-xs font-semibold uppercase tracking-tight text-on-surface-variant">
+        Estimated Delivery
+      </label>
+      <div class="relative">
+        <input
+          id="deliveryDays"
+          type="number"
+          min="1"
+          formControlName="deliveryDays"
+          placeholder="e.g. 14"
+          class="w-full rounded-lg border border-border bg-background px-4 py-3 pr-16 text-base focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary"
+        />
+        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-on-surface-variant"
+          >DAYS</span
+        >
+      </div>
+      @if (form.controls.deliveryDays.touched && form.controls.deliveryDays.errors) {
+        <p class="text-xs text-error">Delivery days must be greater than 0.</p>
+      } @else {
+        <p class="text-[11px] text-on-surface-variant">Average completion time for similar engagements.</p>
+      }
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-2">
+    <label for="coverLetter" class="text-xs font-semibold uppercase tracking-tight text-on-surface-variant">
+      Cover Letter
+    </label>
+    <textarea
+      id="coverLetter"
+      formControlName="coverLetter"
+      rows="6"
+      placeholder="Introduce yourself and explain why you're the best fit for this engagement..."
+      class="w-full resize-none rounded-lg border border-border bg-background px-4 py-3 text-base focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary"
+    ></textarea>
+    <div class="flex justify-between text-xs text-on-surface-variant">
+      @if (form.controls.coverLetter.touched && form.controls.coverLetter.errors?.['maxlength']) {
+        <p class="text-error">Cover letter must be 2000 characters or fewer.</p>
+      } @else if (form.controls.coverLetter.touched && form.controls.coverLetter.errors?.['required']) {
+        <p class="text-error">Cover letter is required.</p>
+      } @else {
+        <span></span>
+      }
+      <span>{{ coverLetterCount() }} / 2000</span>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-2">
+    <label for="experienceSummary" class="text-xs font-semibold uppercase tracking-tight text-on-surface-variant">
+      Relevant Experience Summary
+    </label>
+    <textarea
+      id="experienceSummary"
+      formControlName="experienceSummary"
+      rows="4"
+      placeholder="List specific taxation frameworks or previous corporate clients relevant to this scope..."
+      class="w-full resize-none rounded-lg border border-border bg-background px-4 py-3 text-base focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary"
+    ></textarea>
+    <div class="flex justify-between text-xs text-on-surface-variant">
+      @if (form.controls.experienceSummary.touched && form.controls.experienceSummary.errors?.['maxlength']) {
+        <p class="text-error">Experience summary must be 1000 characters or fewer.</p>
+      } @else if (form.controls.experienceSummary.touched && form.controls.experienceSummary.errors?.['required']) {
+        <p class="text-error">Experience summary is required.</p>
+      } @else {
+        <span></span>
+      }
+      <span>{{ experienceCount() }} / 1000</span>
+    </div>
+  </div>
+
+  @if (serverError()) {
+    <div class="rounded-lg border border-error/30 bg-error/5 px-4 py-3 text-sm text-error" role="alert">
+      {{ serverError() }}
+    </div>
+  }
+
+  <div class="flex flex-col gap-4">
+    <div class="flex items-start gap-3 rounded-lg border border-border bg-surface p-4">
+      <input
+        id="terms"
+        type="checkbox"
+        formControlName="terms"
+        class="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary"
+      />
+      <label for="terms" class="text-sm text-on-surface-variant">
+        I confirm that all provided figures are accurate and I adhere to the Accountant Hub professional code of
+        ethics and confidentiality agreements.
+      </label>
+    </div>
+    @if (form.controls.terms.touched && form.controls.terms.errors) {
+      <p class="text-xs text-error">You must accept the terms to submit a bid.</p>
+    }
+
+    <button
+      type="submit"
+      [disabled]="submitting()"
+      class="flex w-full items-center justify-center gap-3 rounded-lg bg-[#14a800] py-3 text-lg font-bold text-white transition-all hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
+    >
+      @if (submitting()) {
+        <span class="material-symbols-outlined animate-spin">progress_activity</span>
+        Processing...
+      } @else {
+        Submit Bid
+        <span class="material-symbols-outlined">send</span>
+      }
+    </button>
+    <p class="text-center text-xs text-on-surface-variant opacity-60">
+      You can withdraw or edit this bid until the client selects a provider.
+    </p>
+  </div>
+</form>
