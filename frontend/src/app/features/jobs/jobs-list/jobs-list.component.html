@@ -43,7 +43,7 @@
       <div class="flex justify-center py-24">
         <p-progressSpinner ariaLabel="Loading jobs" />
       </div>
-    } @else if (jobs().length === 0) {
+    } @else if (total() === 0) {
       <app-empty-state (clearFilters)="clearFilters()" />
     } @else {
       <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">

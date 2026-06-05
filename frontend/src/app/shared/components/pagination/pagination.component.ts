@@ -8,6 +8,7 @@ export class PaginationComponent {
   readonly total = input.required<number>();
   readonly page = input.required<number>();
   readonly pageSize = input.required<number>();
+  readonly itemLabel = input('jobs');
 
   readonly pageChange = output<number>();
 
@@ -17,12 +18,13 @@ export class PaginationComponent {
 
   readonly rangeLabel = computed(() => {
     const total = this.total();
+    const label = this.itemLabel();
     if (total === 0) {
-      return 'Showing 0 jobs';
+      return `Showing 0 ${label}`;
     }
     const start = (this.page() - 1) * this.pageSize() + 1;
     const end = Math.min(this.page() * this.pageSize(), total);
-    return `Showing ${start}-${end} of ${total} jobs`;
+    return `Showing ${start}-${end} of ${total} ${label}`;
   });
 
   readonly pages = computed(() => {

@@ -6,9 +6,15 @@ import { RegisterComponent } from './features/auth/register/register.component';
 import { BidSubmissionComponent } from './features/jobs/bid-submission/bid-submission.component';
 import { JobsListComponent } from './features/jobs/jobs-list/jobs-list.component';
 import { JobDetailsComponent } from './features/jobs/job-details/job-details.component';
+import { MyBidsDashboardComponent } from './features/my-bids/my-bids-dashboard/my-bids-dashboard.component';
 
 export const routes: Routes = [
   { path: '', component: JobsListComponent },
+  {
+    path: 'my-bids',
+    component: MyBidsDashboardComponent,
+    canActivate: [authGuard]
+  },
   { path: 'jobs/:id', component: JobDetailsComponent },
   {
     path: 'jobs/:id/bid',

@@ -2,7 +2,11 @@
   <nav
     class="mx-auto flex max-w-[1280px] items-center justify-between px-4 py-3 md:px-12"
   >
-    <a routerLink="/" class="font-display text-xl font-bold text-secondary md:text-2xl">
+    <a
+      routerLink="/"
+      (click)="closeMenu()"
+      class="font-display text-xl font-bold text-secondary md:text-2xl"
+    >
       Accountant Hub
     </a>
     <div class="hidden items-center gap-6 md:flex">
@@ -10,11 +14,18 @@
         routerLink="/"
         routerLinkActive="font-bold text-primary border-b-2 border-primary"
         [routerLinkActiveOptions]="{ exact: true }"
-        class="text-on-surface-variant transition-colors hover:text-primary"
+        class="pb-0.5 text-on-surface-variant transition-colors hover:text-primary"
       >
         Jobs
       </a>
       @if (isLoggedIn()) {
+        <a
+          routerLink="/my-bids"
+          routerLinkActive="font-bold text-primary border-b-2 border-primary"
+          class="pb-0.5 text-on-surface-variant transition-colors hover:text-primary"
+        >
+          My Bids
+        </a>
         <span class="text-sm text-on-surface-variant">{{ user()?.fullName }}</span>
         <button
           type="button"
@@ -38,8 +49,70 @@
         </a>
       }
     </div>
-    <button type="button" class="p-2 text-on-surface md:hidden" aria-label="Menu">
-      <span class="material-symbols-outlined">menu</span>
+    <button
+      type="button"
+      (click)="toggleMenu()"
+      class="p-2 text-on-surface md:hidden"
+      [attr.aria-expanded]="menuOpen()"
+      aria-label="Menu"
+    >
+      <span class="material-symbols-outlined">{{ menuOpen() ? 'close' : 'menu' }}</span>
     </button>
   </nav>
 </header>
+
+@if (menuOpen()) {
+  <div
+    class="fixed inset-0 z-40 bg-black/40 md:hidden"
+    (click)="closeMenu()"
+    aria-hidden="true"
+  ></div>
+  <aside
+    class="fixed inset-y-0 right-0 z-50 flex w-[min(100%,280px)] flex-col gap-1 border-l border-border bg-background p-4 shadow-xl md:hidden"
+  >
+    <a
+      routerLink="/"
+      routerLinkActive="bg-surface font-semibold text-primary"
+      [routerLinkActiveOptions]="{ exact: true }"
+      (click)="closeMenu()"
+      class="rounded-lg px-4 py-3 text-on-surface-variant transition-colors hover:bg-surface"
+    >
+      Jobs
+    </a>
+    @if (isLoggedIn()) {
+      <a
+        routerLink="/my-bids"
+        routerLinkActive="bg-surface font-semibold text-primary"
+        (click)="closeMenu()"
+        class="rounded-lg px-4 py-3 text-on-surface-variant transition-colors hover:bg-surface"
+      >
+        My Bids
+      </a>
+      <div class="border-t border-border px-4 py-3 text-sm text-on-surface-variant">
+        {{ user()?.fullName }}
+      </div>
+      <button
+        type="button"
+        (click)="logout()"
+        class="rounded-lg px-4 py-3 text-left text-sm font-semibold text-on-surface-variant transition-colors hover:bg-surface"
+      >
+        Logout
+      </button>
+    } @else {
+      <a
+        routerLink="/login"
+        (click)="closeMenu()"
+        class="rounded-lg px-4 py-3 text-on-surface-variant transition-colors hover:bg-surface"
+      >
+        Login
+      </a>
+      <a
+        routerLink="/register"
+        (click)="closeMenu()"
+        class="mt-2 rounded-lg bg-primary px-4 py-3 text-center text-sm font-bold text-white"
+      >
+        Register
+      </a>
+    }
+  </aside>
+}

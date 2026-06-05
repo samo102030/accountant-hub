@@ -21,3 +21,23 @@ export interface BidApiResponse {
   data: Bid;
   meta: null;
 }
+
+export interface MyBidListItem {
+  id: number;
+  jobId: number;
+  jobTitle: string;
+  companyName: string;
+  jobStatus: string;
+  category: string;
+  proposedPrice: number;
+  deliveryDays: number;
+  createdAt: string;
+  status: string;
+}
+
+export interface MyBidsApiResponse {
+  success: boolean;
+  message: string;
+  data: MyBidListItem[];
+  meta: { total: number; page: number; pageSize: number } | null;
+}
