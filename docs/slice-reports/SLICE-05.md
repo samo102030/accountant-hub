@@ -4,9 +4,9 @@
 
 Slice 5 adds bid submission: `Bids` table with unique `(UserId, JobId)`, `POST /api/jobs/{id}/bids` (JWT), validation (400) and duplicate-bid (409) handling. `GET /api/jobs/{id}` returns optional `userBid` when the caller is authenticated. Frontend: shared `bid-form`, `/jobs/:id/bid` submission page (Stitch `bid_submission`), job details **already-bid** sidebar (Stitch `job_details_already_bid_state`), success toast after submit, Apply hidden/disabled when job is Closed or user already bid.
 
-**Branch note:** `feature/slice-5` was created from `feature/slice-4` because Slice 4 auth is not yet on `main`. Merge **Slice 4 first**, then Slice 5 (or merge both in order).
+Follow-up fix (commit `99c9655`): JWT-only auth for bid endpoints — no cookie redirect to `/Account/Login` (was causing 302 → 404 on submit).
 
-Production API: `https://accountant-hub-production-cc2a.up.railway.app` — `JWT_SECRET` assumed set from Slice 4.
+Production API: `https://accountant-hub-production-cc2a.up.railway.app` — `JWT_SECRET` set from Slice 4.
 
 ## Files created
 
@@ -38,6 +38,9 @@ Production API: `https://accountant-hub-production-cc2a.up.railway.app` — `JWT
 - `backend/AccountantHub.Infrastructure/Persistence/Migrations/AppDbContextModelSnapshot.cs`
 - `backend/AccountantHub.API/Features/Jobs/JobsController.cs` — `userBid` on job detail for auth users
 - `backend/AccountantHub.API/Features/Jobs/JobDetailDto.cs` — `UserBid` property
+- `backend/AccountantHub.Infrastructure/Identity/IdentityServiceExtensions.cs` — `AddIdentityCore` (no cookie redirect)
+- `backend/AccountantHub.API/Program.cs` — JWT default scheme, 401 JSON on challenge
+- `backend/AccountantHub.API/Features/Bids/BidsController.cs` — explicit JWT `[Authorize]` scheme
 - `frontend/src/app/core/models/job.model.ts` — `userBid` on `JobDetail`
 - `frontend/src/app/app.routes.ts` — `/jobs/:id/bid` with `authGuard`
 - `frontend/src/app/features/jobs/job-details/job-details.component.ts` — Apply routing, already-bid state, toast
@@ -85,6 +88,17 @@ Production API: `https://accountant-hub-production-cc2a.up.railway.app` — `JWT
 }
 ```
 
+**Unauthorized (401)** — missing or invalid JWT
+
+```json
+{
+  "success": false,
+  "message": "Unauthorized.",
+  "data": null,
+  "meta": null
+}
+```
+
 **Duplicate bid (409)**
 
 ```json
@@ -106,6 +120,17 @@ Production API: `https://accountant-hub-production-cc2a.up.railway.app` — `JWT
   "meta": null
 }
 ```
+
+## Validation rules (per assessment spec)
+
+| Field | Rules |
+|-------|-------|
+| `proposedPrice` | Required, > 0 |
+| `deliveryDays` | Required, > 0 |
+| `coverLetter` | Required, max 2000 chars (no minimum length in spec) |
+| `experienceSummary` | Required, max 1000 chars (no minimum length in spec) |
+| UI templates | English only; user bid content may be any language (not restricted) |
+| Terms checkbox | Frontend-only (Stitch); not sent to API |
 
 ## Database changes
 
@@ -132,24 +157,31 @@ Applied automatically on API startup via `db.Database.Migrate()`.
 
 | Target | URL | Status |
 |--------|-----|--------|
-| Railway (API) | https://accountant-hub-production-cc2a.up.railway.app | **health 200** on current `main`; bids endpoint **pending merge** of `feature/slice-4` + `feature/slice-5` |
-| Netlify (Angular) | Dashboard production URL | **pending merge** — bid UI after branch merge + rebuild |
+| Railway (API) | https://accountant-hub-production-cc2a.up.railway.app | **merged to `main`** — redeploy after PR #9/#10; verify `POST /api/jobs/1/bids` with JWT |
+| Netlify (Angular) | Dashboard production URL | **merged to `main`** — rebuild after merge; verify Apply + bid form |
 | Local backend build | `dotnet build` | **green** |
 | Local frontend build | `npm run build` → `dist/frontend/browser` | **green** (~868 kB initial) |
 
-Railway auto-deploys from **`main`** only. Live bid endpoints require user merge of `feature/slice-4` then `feature/slice-5` (or both in sequence).
+Railway auto-deploys from **`main`**. After merge, confirm health + bid endpoint on production.
 
-**Railway prerequisite:** `JWT_SECRET` must remain set on the API service (from Slice 4).
+**Railway prerequisite:** `JWT_SECRET` on API service (from Slice 4).
 
 ## Merge status
 
-- Branch **`feature/slice-5`** pushed to `origin`
-- Depends on **`feature/slice-4`** (auth) — merge Slice 4 to `main` before or with Slice 5
-- Merge to `main`: **pending user approval** — Agent did not merge
+- Branch **`feature/slice-5`** merged to **`main`** via PR #9 and PR #10 (includes JWT auth fix `99c9655`)
+- Agent did not merge — user merged via GitHub
+
+## Commits (Slice 5)
+
+| Commit | Description |
+|--------|-------------|
+| `24915b5` | Bid submission API + UI |
+| `0117216` | Initial SLICE-05 report |
+| `99c9655` | Fix JWT auth (no `/Account/Login` redirect) |
 
 ## How to verify
 
-**After merge to `main` (production)**
+**Production (after Railway/Netlify redeploy)**
 
 1. Register/login on Netlify — obtain JWT
 2. Open an **Open** job → **Apply** → `/jobs/{id}/bid` form (Stitch layout)
@@ -167,19 +199,14 @@ Railway auto-deploys from **`main`** only. Live bid endpoints require user merge
 4. Repeat POST — **409**
 5. `cd frontend && npm start` — login → job details → Apply → submit bid → already-bid sidebar
 
-**Pre-merge (current `main`)**
+## Known issues / out of scope
 
-- `POST .../api/jobs/1/bids` returns **404** (endpoint not on `main` yet)
-- `GET /api/health` returns **200**
-
-## Known issues / blockers
-
-1. **Production bids 404 until merge:** Railway tracks `main`; bids + auth are on feature branches only.
-2. **Slice 4 dependency:** `feature/slice-5` includes Slice 4 commits; merge Slice 4 first if merging incrementally.
-3. **Withdraw / edit bid:** Stitch shows “Withdraw Proposal” — out of Slice 5 scope; not implemented.
-4. **View My Proposal:** Opens toast with cover letter; full proposal view ships in Slice 6 (My Bids).
-5. **Bundle size warning:** Initial chunk ~868 kB exceeds 800 kB budget (PrimeNG + Toast); acceptable for assessment.
-6. **Netlify URL:** Not committed; confirm in dashboard after merge.
+1. **Withdraw / edit bid:** Stitch shows “Withdraw Proposal” — Slice 6+ / out of Slice 5 scope.
+2. **View My Proposal:** Toast with cover letter; full dashboard in Slice 6 (`GET /api/my-bids`).
+3. **Service fee / estimated earnings** on already-bid sidebar: UI estimate from Stitch (10%); not persisted in API.
+4. **Bundle size warning:** Initial chunk ~868 kB exceeds 800 kB budget (PrimeNG + Toast); acceptable for assessment.
+5. **Netlify URL:** Confirm in dashboard after deploy.
+6. **PROJECT_STRUCTURE.md:** Bids API/DB documented here; full `PROJECT_STRUCTURE.md` update scheduled for Slice 6 per spec.
 
 ## Stitch
 
@@ -187,5 +214,22 @@ Layout references: local `stitch/bid_submission/code.html` (two-column form page
 
 ## Netlify notes
 
-- `environment.production.ts` → `apiUrl: 'https://accountant-hub-production-cc2a.up.railway.app'` (unchanged)
+- `environment.production.ts` → `apiUrl: 'https://accountant-hub-production-cc2a.up.railway.app'`
 - Publish: `dist/frontend/browser`
+
+## Slice 5 completion checklist
+
+| Item | Status |
+|------|--------|
+| Bids table + unique (userId, jobId) | [x] |
+| POST `/api/jobs/{id}/bids` JWT + 400/409 | [x] |
+| Bid form UI (Stitch bid_submission) | [x] |
+| Already-bid state (Stitch job_details_already_bid_state) | [x] |
+| Success toast after submit | [x] |
+| One bid per user; Closed job blocks Apply | [x] |
+| JWT auth fix (no cookie redirect) | [x] |
+| Branch pushed + merged to `main` | [x] |
+| Slice report complete | [x] |
+| Live production smoke test (user) | [ ] — verify after Railway/Netlify redeploy |
+
+**Slice 5 development: complete.** Awaiting user production verification before starting Slice 6.
