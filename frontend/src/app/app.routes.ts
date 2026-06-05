@@ -4,6 +4,7 @@ import { guestGuard } from './core/guards/guest.guard';
 import { LoginComponent } from './features/auth/login/login.component';
 import { RegisterComponent } from './features/auth/register/register.component';
 import { BidSubmissionComponent } from './features/jobs/bid-submission/bid-submission.component';
+import { MyProposalComponent } from './features/jobs/my-proposal/my-proposal.component';
 import { JobsListComponent } from './features/jobs/jobs-list/jobs-list.component';
 import { JobDetailsComponent } from './features/jobs/job-details/job-details.component';
 import { MyBidsDashboardComponent } from './features/my-bids/my-bids-dashboard/my-bids-dashboard.component';
@@ -19,6 +20,11 @@ export const routes: Routes = [
   {
     path: 'jobs/:id/bid',
     component: BidSubmissionComponent,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'jobs/:id/my-proposal',
+    component: MyProposalComponent,
     canActivate: [authGuard]
   },
   { path: 'login', component: LoginComponent, canActivate: [guestGuard] },

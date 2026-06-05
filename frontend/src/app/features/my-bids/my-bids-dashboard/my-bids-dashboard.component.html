@@ -148,12 +148,10 @@
           </thead>
           <tbody>
             @for (bid of bids(); track bid.id) {
-              <tr class="cursor-pointer border-b border-border transition-colors hover:bg-surface">
+              <tr class="border-b border-border transition-colors hover:bg-surface">
                 <td class="px-6 py-4">
-                  <a [routerLink]="['/jobs', bid.jobId]" class="block">
-                    <div class="font-semibold text-secondary">{{ bid.jobTitle }}</div>
-                    <div class="text-sm text-on-surface-variant">{{ bid.companyName }}</div>
-                  </a>
+                  <div class="font-semibold text-secondary">{{ bid.jobTitle }}</div>
+                  <div class="text-sm text-on-surface-variant">{{ bid.companyName }}</div>
                 </td>
                 <td class="px-6 py-4 font-semibold text-primary">
                   {{ bid.proposedPrice | currency: 'USD' : 'symbol' : '1.2-2' }}
@@ -170,14 +168,25 @@
                     {{ bid.status }}
                   </span>
                 </td>
-                <td class="px-6 py-4 text-right">
-                  <a
-                    [routerLink]="['/jobs', bid.jobId]"
-                    class="inline-flex rounded-full p-2 text-on-surface-variant transition-colors hover:bg-surface"
-                    aria-label="View job"
-                  >
-                    <span class="material-symbols-outlined">open_in_new</span>
-                  </a>
+                <td class="px-6 py-4">
+                  <div class="flex items-center justify-end gap-2">
+                    <a
+                      [routerLink]="['/jobs', bid.jobId]"
+                      [queryParams]="{ from: 'my-bids' }"
+                      class="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-surface"
+                    >
+                      <span class="material-symbols-outlined text-base">work</span>
+                      Job Details
+                    </a>
+                    <a
+                      [routerLink]="['/jobs', bid.jobId, 'my-proposal']"
+                      [queryParams]="{ from: 'my-bids' }"
+                      class="inline-flex items-center gap-1 rounded-lg border border-primary px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/5"
+                    >
+                      <span class="material-symbols-outlined text-base">visibility</span>
+                      My Proposal
+                    </a>
+                  </div>
                 </td>
               </tr>
             }
@@ -187,7 +196,7 @@
 
       <div class="divide-y divide-border md:hidden">
         @for (bid of bids(); track bid.id) {
-          <a [routerLink]="['/jobs', bid.jobId]" class="block p-4 transition-colors hover:bg-surface">
+          <div class="p-4">
             <div class="mb-3 flex items-start justify-between gap-3">
               <h3 class="font-semibold text-secondary">{{ bid.jobTitle }}</h3>
               <span
@@ -198,7 +207,7 @@
               </span>
             </div>
             <p class="mb-3 text-sm text-on-surface-variant">{{ bid.companyName }}</p>
-            <div class="grid grid-cols-2 gap-4">
+            <div class="mb-4 grid grid-cols-2 gap-4">
               <div>
                 <p class="text-xs font-semibold uppercase text-on-surface-variant">Price</p>
                 <p class="font-semibold text-primary">
@@ -210,7 +219,25 @@
                 <p class="text-sm">{{ bid.deliveryDays }} Days</p>
               </div>
             </div>
-          </a>
+            <div class="flex flex-col gap-2 sm:flex-row">
+              <a
+                [routerLink]="['/jobs', bid.jobId]"
+                [queryParams]="{ from: 'my-bids' }"
+                class="inline-flex flex-1 items-center justify-center gap-1 rounded-lg border border-border px-3 py-2 text-sm font-semibold text-secondary transition-colors hover:bg-surface"
+              >
+                <span class="material-symbols-outlined text-base">work</span>
+                Job Details
+              </a>
+              <a
+                [routerLink]="['/jobs', bid.jobId, 'my-proposal']"
+                [queryParams]="{ from: 'my-bids' }"
+                class="inline-flex flex-1 items-center justify-center gap-1 rounded-lg border border-primary px-3 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary/5"
+              >
+                <span class="material-symbols-outlined text-base">visibility</span>
+                My Proposal
+              </a>
+            </div>
+          </div>
         }
       </div>
     </div>

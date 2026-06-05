@@ -41,6 +41,16 @@ export class JobDetailsComponent implements OnInit {
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
 
+  fromMyBids = false;
+
+  get backLink(): string[] {
+    return this.fromMyBids ? ['/my-bids'] : ['/'];
+  }
+
+  get backLabel(): string {
+    return this.fromMyBids ? 'Back to My Bids' : 'Back to Jobs List';
+  }
+
   readonly attachments: AttachmentPlaceholder[] = [
     {
       name: 'Project_Brief.pdf',
@@ -57,6 +67,7 @@ export class JobDetailsComponent implements OnInit {
   ];
 
   ngOnInit(): void {
+    this.fromMyBids = this.route.snapshot.queryParamMap.get('from') === 'my-bids';
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (!id || Number.isNaN(id)) {
       this.error.set('Invalid job id.');
@@ -133,14 +144,5 @@ export class JobDetailsComponent implements OnInit {
 
   estimatedEarnings(bid: Bid): number {
     return Math.round((bid.proposedPrice - this.serviceFee(bid.proposedPrice)) * 100) / 100;
-  }
-
-  showProposal(bid: Bid): void {
-    this.messageService.add({
-      severity: 'info',
-      summary: 'Your proposal',
-      detail: bid.coverLetter,
-      life: 6000
-    });
   }
 }

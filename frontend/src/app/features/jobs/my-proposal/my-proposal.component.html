@@ -1,0 +1,172 @@
+<app-header />
+
+@if (loading()) {
+  <div class="flex justify-center py-24">
+    <p-progressSpinner ariaLabel="Loading proposal" />
+  </div>
+} @else if (error()) {
+  <main class="mx-auto max-w-[1200px] px-4 py-12 md:px-12">
+    <a
+      [routerLink]="backLink"
+      class="mb-6 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
+    >
+      <span class="material-symbols-outlined text-base">arrow_back</span>
+      {{ backLabel }}
+    </a>
+    <div
+      class="rounded-xl border border-error/30 bg-error/5 px-6 py-8 text-center text-error"
+      role="alert"
+    >
+      {{ error() }}
+    </div>
+  </main>
+} @else if (job(); as item) {
+  @if (bid(); as proposal) {
+    <main class="flex-grow px-4 pb-12 pt-28 md:px-12">
+      <div class="mx-auto max-w-[1200px]">
+        <div class="mb-6 flex items-center gap-2">
+          <span class="material-symbols-outlined text-xl text-primary">arrow_back</span>
+          <a
+            [routerLink]="backLink"
+            class="text-sm font-semibold uppercase tracking-wider text-primary hover:underline"
+          >
+            {{ backLabel }}
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          <div class="flex flex-col gap-6 lg:col-span-4">
+            <div class="flex flex-col gap-4 rounded-lg border border-border bg-background p-6">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">visibility</span>
+                <span
+                  class="rounded bg-primary/10 px-2 py-0.5 text-xs font-semibold uppercase text-primary"
+                  >Submitted Proposal</span
+                >
+              </div>
+              <h1 class="font-display text-2xl font-semibold text-secondary md:text-3xl">
+                My Proposal
+              </h1>
+              <p class="text-on-surface-variant">
+                Your submitted bid for:
+                <span class="font-bold text-secondary">{{ item.title }}</span>.
+              </p>
+              <div class="mt-2 border-t border-border pt-6">
+                <div class="mb-4 flex items-center gap-4">
+                  <div
+                    class="flex h-12 w-12 items-center justify-center rounded-lg bg-surface text-primary"
+                  >
+                    <span class="material-symbols-outlined">business</span>
+                  </div>
+                  <div>
+                    <div class="font-bold">{{ item.companyName }}</div>
+                    <div class="text-sm text-on-surface-variant">{{ item.category }}</div>
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                  <div class="flex flex-col rounded border border-border bg-surface p-2">
+                    <span class="text-xs font-semibold uppercase text-on-surface-variant"
+                      >Client Budget</span
+                    >
+                    <span class="font-bold text-primary">{{ budgetLabel(item) }}</span>
+                  </div>
+                  <div class="flex flex-col rounded border border-border bg-surface p-2">
+                    <span class="text-xs font-semibold uppercase text-on-surface-variant"
+                      >Submitted</span
+                    >
+                    <span class="font-bold">{{ proposal.createdAt | date: 'MMM d, yyyy' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-3 rounded-lg bg-inverse-surface p-6 text-white">
+              <h3 class="flex items-center gap-2 text-lg font-bold">
+                <span class="material-symbols-outlined text-primary">info</span>
+                Proposal Status
+              </h3>
+              <p class="text-sm opacity-90">
+                This proposal has been submitted and is read-only. The client can review your bid
+                until they select a provider.
+              </p>
+            </div>
+          </div>
+
+          <div class="lg:col-span-8">
+            <div
+              class="flex flex-col gap-6 rounded-lg border border-border bg-background p-6 shadow-sm md:p-10"
+            >
+              <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div class="flex flex-col gap-2">
+                  <span class="text-xs font-semibold uppercase tracking-tight text-on-surface-variant"
+                    >Proposed Price</span
+                  >
+                  <p class="rounded-lg border border-border bg-surface px-4 py-3 text-base font-bold text-secondary">
+                    ${{ proposal.proposedPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+                  </p>
+                </div>
+                <div class="flex flex-col gap-2">
+                  <span class="text-xs font-semibold uppercase tracking-tight text-on-surface-variant"
+                    >Estimated Delivery</span
+                  >
+                  <p class="rounded-lg border border-border bg-surface px-4 py-3 text-base font-bold text-secondary">
+                    {{ proposal.deliveryDays }} days
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex flex-col gap-2">
+                <span class="text-xs font-semibold uppercase tracking-tight text-on-surface-variant"
+                  >Cover Letter</span
+                >
+                <p
+                  class="min-h-[9rem] whitespace-pre-wrap rounded-lg border border-border bg-surface px-4 py-3 text-base leading-relaxed text-on-surface"
+                >
+                  {{ proposal.coverLetter }}
+                </p>
+              </div>
+
+              <div class="flex flex-col gap-2">
+                <span class="text-xs font-semibold uppercase tracking-tight text-on-surface-variant"
+                  >Relevant Experience Summary</span
+                >
+                <p
+                  class="min-h-[6rem] whitespace-pre-wrap rounded-lg border border-border bg-surface px-4 py-3 text-base leading-relaxed text-on-surface"
+                >
+                  {{ proposal.experienceSummary }}
+                </p>
+              </div>
+
+              <div class="flex flex-col gap-2 border-t border-border pt-4">
+                <span class="text-xs font-semibold uppercase tracking-tight text-on-surface-variant"
+                  >Submitted On</span
+                >
+                <p class="text-base font-semibold text-secondary">
+                  {{ proposal.createdAt | date: 'fullDate' }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  }
+}
+
+<footer class="bg-inverse-surface text-white">
+  <div
+    class="mx-auto flex max-w-[1200px] flex-col items-center justify-between gap-6 px-4 py-8 md:flex-row md:px-12"
+  >
+    <div class="text-center md:text-left">
+      <div class="font-display text-xl font-bold">Accountant Hub</div>
+      <p class="mt-1 text-sm text-white/70">
+        © 2024 Accountant Hub. Professional Financial Marketplace.
+      </p>
+    </div>
+    <div class="flex flex-wrap justify-center gap-6 text-sm text-white/70">
+      <span>Privacy Policy</span>
+      <span>Terms of Service</span>
+      <span>Support</span>
+    </div>
+  </div>
+</footer>
