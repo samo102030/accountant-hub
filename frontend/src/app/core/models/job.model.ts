@@ -1,3 +1,5 @@
+import { Bid } from './bid.model';
+
 export interface JobListItem {
   id: number;
   title: string;
@@ -26,7 +28,9 @@ export interface JobsApiResponse {
   meta: JobsMeta;
 }
 
-export interface JobDetail extends JobListItem {}
+export interface JobDetail extends JobListItem {
+  userBid?: Bid | null;
+}
 
 export interface JobDetailApiResponse {
   success: boolean;

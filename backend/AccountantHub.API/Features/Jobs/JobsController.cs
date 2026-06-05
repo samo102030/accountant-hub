@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using AccountantHub.API.Features.Bids;
 using AccountantHub.Infrastructure.Persistence;
 using AccountantHub.Infrastructure.Persistence.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -113,7 +115,8 @@ public class JobsController : ControllerBase
                 Status = j.Status == JobStatus.Open ? "Open" : "Closed",
                 CreatedAt = j.CreatedAt,
                 Tags = j.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
-                BidCount = j.BidCount
+                BidCount = j.BidCount,
+                UserBid = null
             })
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -126,6 +129,25 @@ public class JobsController : ControllerBase
                 data = (object?)null,
                 meta = (object?)null
             });
+        }
+
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!string.IsNullOrEmpty(userId))
+        {
+            job.UserBid = await _db.Bids
+                .AsNoTracking()
+                .Where(b => b.JobId == id && b.UserId == userId)
+                .Select(b => new BidDto
+                {
+                    Id = b.Id,
+                    JobId = b.JobId,
+                    ProposedPrice = b.ProposedPrice,
+                    DeliveryDays = b.DeliveryDays,
+                    CoverLetter = b.CoverLetter,
+                    ExperienceSummary = b.ExperienceSummary,
+                    CreatedAt = b.CreatedAt
+                })
+                .FirstOrDefaultAsync(cancellationToken);
         }
 
         return Ok(new

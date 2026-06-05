@@ -1,3 +1,4 @@
+<p-toast position="top-right" />
 <app-header />
 
 @if (loading()) {
@@ -145,57 +146,125 @@
 
       <aside class="lg:w-[30%]">
         <div class="sticky top-24 flex flex-col gap-6">
-          <div class="rounded-xl bg-inverse-surface p-6 text-white shadow-xl">
-            <div class="mb-6">
-              <p class="mb-1 text-sm font-semibold uppercase text-white/60">Estimated Budget</p>
-              <h3 class="font-display text-3xl font-bold leading-none md:text-4xl">
-                {{ budgetLabel(item) }}
-              </h3>
-            </div>
+          @if (auth.isLoggedIn() && hasUserBid(item) && item.userBid; as bid) {
+            <div class="rounded-xl border border-border bg-background p-6 shadow-sm">
+              <div class="flex flex-col gap-4">
+                <div
+                  class="flex items-start gap-3 rounded-lg border border-primary/20 bg-primary/10 p-4 text-secondary"
+                >
+                  <span
+                    class="material-symbols-outlined text-primary"
+                    style="font-variation-settings: 'FILL' 1"
+                    >check_circle</span
+                  >
+                  <div>
+                    <p class="text-sm font-semibold">Bid Already Submitted</p>
+                    <p class="mt-1 text-sm">
+                      You submitted a proposal for this job on
+                      {{ bid.createdAt | date: 'MMM d, yyyy' }}.
+                    </p>
+                  </div>
+                </div>
 
-            <div class="mb-6 space-y-2">
-              <div class="flex items-center justify-between border-b border-white/20 py-2">
-                <span class="text-white/60">Bids received</span>
-                <span class="font-bold">{{ item.bidCount }}</span>
+                <button
+                  type="button"
+                  disabled
+                  class="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg bg-surface py-3 text-sm font-semibold text-on-surface-variant opacity-70"
+                >
+                  Apply for Job
+                </button>
+
+                <button
+                  type="button"
+                  (click)="showProposal(bid)"
+                  class="flex w-full items-center justify-center gap-2 rounded-lg border border-primary py-3 text-sm font-semibold text-primary transition-colors hover:bg-primary/5"
+                >
+                  <span class="material-symbols-outlined text-xl">visibility</span>
+                  View My Proposal
+                </button>
               </div>
-              <div class="flex items-center justify-between border-b border-white/20 py-2">
-                <span class="text-white/60">Posted on</span>
-                <span class="font-bold">{{ item.createdAt | date: 'MMM d, yyyy' }}</span>
-              </div>
-              <div class="flex items-center justify-between py-2">
-                <span class="text-white/60">Avg. Bid</span>
-                <span class="font-bold text-primary">{{ avgBidLabel(item) }}</span>
+
+              <div class="mt-6 space-y-3 border-t border-border pt-6">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-on-surface-variant">Your bid amount:</span>
+                  <span class="text-sm font-semibold">${{ bid.proposedPrice.toLocaleString() }}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-on-surface-variant">Service fee (10%):</span>
+                  <span class="text-sm font-semibold">-${{ serviceFee(bid.proposedPrice).toLocaleString() }}</span>
+                </div>
+                <div class="flex items-center justify-between border-t border-border pt-3">
+                  <span class="text-sm font-semibold">Estimated earnings:</span>
+                  <span class="font-display text-xl font-semibold text-primary"
+                    >${{ estimatedEarnings(bid).toLocaleString() }}</span
+                  >
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-on-surface-variant">Delivery:</span>
+                  <span class="text-sm font-semibold">{{ bid.deliveryDays }} days</span>
+                </div>
               </div>
             </div>
+          } @else {
+            <div class="rounded-xl bg-inverse-surface p-6 text-white shadow-xl">
+              <div class="mb-6">
+                <p class="mb-1 text-sm font-semibold uppercase text-white/60">Estimated Budget</p>
+                <h3 class="font-display text-3xl font-bold leading-none md:text-4xl">
+                  {{ budgetLabel(item) }}
+                </h3>
+              </div>
 
-            @if (auth.isLoggedIn()) {
+              <div class="mb-6 space-y-2">
+                <div class="flex items-center justify-between border-b border-white/20 py-2">
+                  <span class="text-white/60">Bids received</span>
+                  <span class="font-bold">{{ item.bidCount }}</span>
+                </div>
+                <div class="flex items-center justify-between border-b border-white/20 py-2">
+                  <span class="text-white/60">Posted on</span>
+                  <span class="font-bold">{{ item.createdAt | date: 'MMM d, yyyy' }}</span>
+                </div>
+                <div class="flex items-center justify-between py-2">
+                  <span class="text-white/60">Avg. Bid</span>
+                  <span class="font-bold text-primary">{{ avgBidLabel(item) }}</span>
+                </div>
+              </div>
+
+              @if (item.status === 'Closed') {
+                <button
+                  type="button"
+                  disabled
+                  class="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg bg-white/20 py-3 font-display text-base font-semibold text-white/70"
+                >
+                  Job Closed
+                </button>
+              } @else if (auth.isLoggedIn()) {
+                <button
+                  type="button"
+                  (click)="applyForJob(item.id)"
+                  class="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 font-display text-base font-semibold text-white transition-opacity hover:opacity-90"
+                >
+                  Apply
+                  <span class="material-symbols-outlined">send</span>
+                </button>
+              } @else {
+                <button
+                  type="button"
+                  (click)="loginToApply()"
+                  class="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 font-display text-base font-semibold text-white transition-opacity hover:opacity-90"
+                >
+                  Login to Apply
+                  <span class="material-symbols-outlined">login</span>
+                </button>
+              }
               <button
                 type="button"
                 disabled
-                class="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 font-display text-base font-semibold text-white opacity-90"
-                title="Bidding available in a future update"
+                class="mt-3 w-full rounded-lg border border-white/30 py-3 text-base text-white/70"
               >
-                Apply
-                <span class="material-symbols-outlined">send</span>
+                Save for Later
               </button>
-            } @else {
-              <button
-                type="button"
-                (click)="loginToApply()"
-                class="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 font-display text-base font-semibold text-white transition-opacity hover:opacity-90"
-              >
-                Login to Apply
-                <span class="material-symbols-outlined">login</span>
-              </button>
-            }
-            <button
-              type="button"
-              disabled
-              class="mt-3 w-full rounded-lg border border-white/30 py-3 text-base text-white/70"
-            >
-              Save for Later
-            </button>
-          </div>
+            </div>
+          }
 
           <div class="rounded-xl border border-border bg-background p-6 shadow-sm">
             <h4 class="mb-4 text-sm font-semibold uppercase text-on-surface-variant">

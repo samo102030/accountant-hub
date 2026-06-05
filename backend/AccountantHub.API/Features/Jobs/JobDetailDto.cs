@@ -1,3 +1,5 @@
+using AccountantHub.API.Features.Bids;
+
 namespace AccountantHub.API.Features.Jobs;
 
 public class JobDetailDto
@@ -14,4 +16,5 @@ public class JobDetailDto
     public DateTime CreatedAt { get; set; }
     public IReadOnlyList<string> Tags { get; set; } = Array.Empty<string>();
     public int BidCount { get; set; }
+    public BidDto? UserBid { get; set; }
 }

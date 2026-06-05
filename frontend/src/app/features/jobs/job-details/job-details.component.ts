@@ -1,10 +1,13 @@
 import { DatePipe, UpperCasePipe } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { MessageService } from 'primeng/api';
+import { Toast } from 'primeng/toast';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { AppHeaderComponent } from '../../../shared/components/app-header/app-header.component';
 import { AuthService } from '../../../core/services/auth.service';
 import { JobsService } from '../../../core/services/jobs.service';
+import { Bid } from '../../../core/models/bid.model';
 import { JobDetail } from '../../../core/models/job.model';
 
 interface AttachmentPlaceholder {
@@ -21,14 +24,17 @@ interface AttachmentPlaceholder {
     DatePipe,
     UpperCasePipe,
     ProgressSpinner,
+    Toast,
     AppHeaderComponent
   ],
+  providers: [MessageService],
   templateUrl: './job-details.component.html'
 })
 export class JobDetailsComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly jobsService = inject(JobsService);
+  private readonly messageService = inject(MessageService);
   readonly auth = inject(AuthService);
 
   readonly job = signal<JobDetail | null>(null);
@@ -58,6 +64,26 @@ export class JobDetailsComponent implements OnInit {
       return;
     }
 
+    this.loadJob(id);
+
+    if (this.route.snapshot.queryParamMap.get('bidSubmitted') === 'true') {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Bid submitted',
+        detail: 'Your proposal was submitted successfully.',
+        life: 4000
+      });
+      void this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { bidSubmitted: null },
+        queryParamsHandling: 'merge',
+        replaceUrl: true
+      });
+    }
+  }
+
+  private loadJob(id: number): void {
+    this.loading.set(true);
     this.jobsService.getJob(id).subscribe({
       next: (res) => {
         this.job.set(res.data);
@@ -87,5 +113,30 @@ export class JobDetailsComponent implements OnInit {
   loginToApply(): void {
     const returnUrl = this.router.url;
     void this.router.navigate(['/login'], { queryParams: { returnUrl } });
+  }
+
+  applyForJob(jobId: number): void {
+    void this.router.navigate(['/jobs', jobId, 'bid']);
+  }
+
+  hasUserBid(job: JobDetail): boolean {
+    return !!job.userBid;
+  }
+
+  serviceFee(price: number): number {
+    return Math.round(price * 0.1 * 100) / 100;
+  }
+
+  estimatedEarnings(bid: Bid): number {
+    return Math.round((bid.proposedPrice - this.serviceFee(bid.proposedPrice)) * 100) / 100;
+  }
+
+  showProposal(bid: Bid): void {
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Your proposal',
+      detail: bid.coverLetter,
+      life: 6000
+    });
   }
 }
