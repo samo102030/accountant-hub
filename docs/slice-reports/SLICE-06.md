@@ -87,16 +87,17 @@ None — uses existing `Bids` table from Slice 5.
 
 | Target | URL | Status |
 |--------|-----|--------|
-| Railway (API) | https://accountant-hub-production-cc2a.up.railway.app | **pending merge** — redeploy after PR merge from `feature/slice-6` |
-| Netlify (Angular) | Confirm in Netlify dashboard | **pending merge** — rebuild after PR merge |
+| Railway (API) | https://accountant-hub-production-cc2a.up.railway.app | **merged to `main` (PR #11)** — production redeploy triggered via doc push; verify `GET /api/my-bids` in Swagger |
+| Netlify (Angular) | Confirm in Netlify dashboard | **merged to `main`** — rebuild after Railway deploy |
 | Local backend build | `dotnet build` | **green** (after stopping local API process if running) |
 | Local frontend build | `npm run build` → `dist/frontend/browser` | **green** (~891 kB initial) |
 
-Railway auto-deploys from **`main`**. After user merges `feature/slice-6`, verify `GET /api/my-bids` with Bearer token on production.
+Railway auto-deploys from **`main`**. Initial deploy after PR #11 did not run (platform incident); follow-up push to `main` triggers a fresh build.
 
 ## Merge status
 
-- Branch **`feature/slice-6`** pushed to GitHub — **merge to `main` pending user approval**
+- Branch **`feature/slice-6`** merged to **`main`** via PR #11 (`6c9408a`)
+- Feature branch pushed; user merged via GitHub
 - Agent did **not** merge (per spec)
 
 ## How to verify
@@ -127,6 +128,7 @@ Railway auto-deploys from **`main`**. After user merges `feature/slice-6`, verif
 4. **Netlify URL:** Not in repo — confirm in dashboard after deploy.
 5. **Bundle size warning:** Initial chunk ~891 kB exceeds 800 kB budget (PrimeNG + Toast); acceptable for assessment.
 6. **Stats on paginated page:** Total Value / Active Bids computed from current page items when paginated; full totals would need API meta fields (out of scope).
+7. **Railway deploy delay:** Auto-deploy did not pick up PR #11 merge (platform incident). Redeploy restarts the old build; a new push to `main` is required for Slice 6 API on production.
 
 ## Stitch
 
@@ -149,7 +151,7 @@ Layout references: local `stitch/my_bids_dashboard/code.html` (table + mobile ca
 | Navbar mobile hamburger + My Bids link | [x] |
 | Full README.md | [x] |
 | PROJECT_STRUCTURE.md final update | [x] |
-| Branch pushed; merge pending user | [ ] — push after commit |
-| Live production smoke test (user) | [ ] — verify after merge + deploy |
+| Branch pushed + merged to `main` (PR #11) | [x] |
+| Live production smoke test (user) | [ ] — verify after Railway deploy shows `GET /api/my-bids` in Swagger |
 
-**Slice 6 development: complete.** Awaiting user merge and production verification.
+**Slice 6 development: complete.** Awaiting production verification after Railway redeploy.
