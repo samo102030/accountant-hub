@@ -1,0 +1,66 @@
+@let item = job();
+<article
+  class="job-card-hover relative flex flex-col gap-4 overflow-hidden rounded-xl border border-border bg-background p-6"
+>
+  <div class="absolute right-0 top-0 p-6">
+    <span
+      class="flex items-center gap-1 rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-on-surface-variant"
+      [class.opacity-60]="item.status !== 'Open'"
+    >
+      @if (item.status === 'Open') {
+        <span class="h-2 w-2 animate-pulse rounded-full bg-primary"></span>
+      }
+      {{ item.status | uppercase }}
+    </span>
+  </div>
+
+  <div class="flex items-start gap-4 pr-20">
+    <div
+      class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-border bg-surface"
+    >
+      <span class="material-symbols-outlined text-primary">business</span>
+    </div>
+    <div class="min-w-0 flex-1">
+      <h3
+        class="font-display text-lg font-semibold leading-tight text-secondary transition-colors group-hover:text-primary"
+      >
+        {{ item.title }}
+      </h3>
+      <p class="text-sm text-on-surface-variant">
+        {{ item.companyName }} • {{ postedLabel(item.createdAt) }}
+      </p>
+    </div>
+  </div>
+
+  <p class="line-clamp-2 text-sm text-on-surface-variant">{{ item.description }}</p>
+
+  <div class="flex flex-wrap gap-2">
+    @for (tag of item.tags; track tag) {
+      <span
+        class="rounded-md border border-border bg-surface px-2 py-1 text-xs font-medium uppercase text-on-surface-variant"
+      >
+        {{ tag }}
+      </span>
+    }
+  </div>
+
+  <div class="mt-2 flex items-center justify-between border-t border-border pt-4">
+    <div>
+      <span class="text-xs font-medium uppercase text-on-surface-variant">Budget</span>
+      <p class="font-display text-lg font-bold text-primary">{{ budgetLabel(item) }}</p>
+    </div>
+    <div class="flex items-center gap-6">
+      <div class="text-right">
+        <span class="block text-xs font-medium uppercase text-on-surface-variant">Bids</span>
+        <span class="text-sm font-bold">{{ item.bidCount }} Bidders</span>
+      </div>
+      <button
+        type="button"
+        class="rounded-lg bg-primary p-2 text-white transition-opacity hover:opacity-90"
+        aria-label="View job"
+      >
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
+    </div>
+  </div>
+</article>

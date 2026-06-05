@@ -58,10 +58,13 @@ Angular:          21.2.0
 Angular CLI:      21.2.14
 .NET SDK:         8.0.421
 Swashbuckle:      6.6.2
-PrimeNG:          (Slice 2)
-Tailwind CSS:     (Slice 2)
-Material Symbols: (Slice 2)
-PostgreSQL:       (Slice 2 — from Railway dashboard)
+PrimeNG:          21.1.9
+@primeng/themes:  21.0.4
+Tailwind CSS:     4.3.0
+Material Symbols: Google Fonts (Outlined)
+EF Core:          8.0.11
+Npgsql EF:        8.0.11
+PostgreSQL:       Railway-managed (Slice 2+)
 ```
 
 Note: Angular CLI 22 requires Node ≥22.22.3; this repo uses Angular 21 on Node 22.22.0.

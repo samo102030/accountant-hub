@@ -1,0 +1,192 @@
+<app-header />
+
+<div class="mx-auto flex min-h-[calc(100vh-72px)] max-w-[1280px] flex-col bg-background md:flex-row">
+  <aside
+    class="hidden w-full shrink-0 flex-col gap-4 border-b border-border bg-background p-4 md:sticky md:top-[72px] md:flex md:h-[calc(100vh-72px)] md:w-64 md:overflow-y-auto md:border-b-0 md:border-r md:p-6"
+  >
+    <ng-container *ngTemplateOutlet="filtersForm" />
+  </aside>
+
+  <main class="flex-1 p-4 md:p-12">
+    <div class="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <h1 class="font-display text-2xl font-semibold text-secondary md:text-3xl">
+          Financial Opportunities
+        </h1>
+        <p class="text-sm text-on-surface-variant md:text-base">
+          @if (loading()) {
+            Loading opportunities…
+          } @else {
+            Browse {{ total() }} open engagements for professional accountants.
+          }
+        </p>
+      </div>
+      @if (!loading() && total() > 0) {
+        <span
+          class="hidden rounded-full bg-surface px-3 py-1 text-xs font-medium text-on-surface-variant md:inline"
+        >
+          {{ total() }} JOBS FOUND
+        </span>
+      }
+    </div>
+
+    @if (error()) {
+      <div
+        class="mb-6 rounded-lg border border-error/30 bg-error/5 px-4 py-3 text-sm text-error"
+        role="alert"
+      >
+        {{ error() }}
+      </div>
+    }
+
+    @if (loading()) {
+      <div class="flex justify-center py-24">
+        <p-progressSpinner ariaLabel="Loading jobs" />
+      </div>
+    } @else if (jobs().length === 0) {
+      <app-empty-state (clearFilters)="clearFilters()" />
+    } @else {
+      <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        @for (job of jobs(); track job.id) {
+          <app-job-card [job]="job" />
+        }
+      </div>
+      <app-pagination
+        [total]="total()"
+        [page]="page"
+        [pageSize]="pageSize"
+        (pageChange)="onPageChange($event)"
+      />
+    }
+  </main>
+</div>
+
+@if (filtersOpen()) {
+  <div
+    class="fixed inset-0 z-30 bg-black/40 md:hidden"
+    (click)="filtersOpen.set(false)"
+    aria-hidden="true"
+  ></div>
+  <aside
+    class="fixed inset-y-0 left-0 z-40 flex w-[min(100%,320px)] flex-col gap-4 overflow-y-auto border-r border-border bg-background p-4 shadow-xl md:hidden"
+  >
+    <div class="flex items-center justify-between">
+      <h2 class="font-display text-lg font-bold text-secondary">Filters</h2>
+      <button type="button" (click)="filtersOpen.set(false)" aria-label="Close filters">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <ng-container *ngTemplateOutlet="filtersForm" />
+  </aside>
+}
+
+<ng-template #filtersForm>
+  <div class="mb-2 hidden md:block">
+    <h2 class="font-display text-xl font-bold text-secondary">Filters</h2>
+    <p class="text-sm text-on-surface-variant">Narrow your search</p>
+  </div>
+
+  <form class="flex flex-col gap-4" (ngSubmit)="applyFilters()">
+    <div class="flex flex-col gap-1">
+      <label class="text-xs font-semibold uppercase text-on-surface-variant">Search Jobs</label>
+      <span class="relative block">
+        <input
+          pInputText
+          type="text"
+          [(ngModel)]="search"
+          name="search"
+          placeholder="Keywords..."
+          class="w-full"
+        />
+        <span
+          class="material-symbols-outlined pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-lg text-on-surface-variant"
+          >search</span
+        >
+      </span>
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label class="text-xs font-semibold uppercase text-on-surface-variant">Category</label>
+      <p-select
+        [(ngModel)]="category"
+        name="category"
+        [options]="categories"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="All Jobs"
+        styleClass="w-full"
+      />
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label class="text-xs font-semibold uppercase text-on-surface-variant">Budget ($)</label>
+      <div class="flex items-center gap-2">
+        <p-inputNumber
+          [(ngModel)]="budgetMin"
+          name="budgetMin"
+          placeholder="Min"
+          [min]="0"
+          styleClass="w-full"
+          inputStyleClass="w-full"
+        />
+        <span class="text-on-surface-variant">to</span>
+        <p-inputNumber
+          [(ngModel)]="budgetMax"
+          name="budgetMax"
+          placeholder="Max"
+          [min]="0"
+          styleClass="w-full"
+          inputStyleClass="w-full"
+        />
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label class="text-xs font-semibold uppercase text-on-surface-variant">Sort by</label>
+      <p-select
+        [(ngModel)]="sort"
+        name="sort"
+        [options]="sortOptions"
+        optionLabel="label"
+        optionValue="value"
+        styleClass="w-full"
+      />
+    </div>
+
+    <p-button type="submit" label="Apply Filters" styleClass="w-full" />
+    <button
+      type="button"
+      (click)="clearFilters()"
+      class="text-left text-sm font-semibold text-primary hover:underline"
+    >
+      Clear all
+    </button>
+  </form>
+</ng-template>
+
+<footer class="bg-inverse-surface text-white">
+  <div
+    class="mx-auto flex max-w-[1280px] flex-col items-center justify-between gap-6 px-4 py-8 md:flex-row md:px-12"
+  >
+    <div class="text-center md:text-left">
+      <div class="font-display text-xl font-bold">Accountant Hub</div>
+      <p class="mt-1 text-sm text-white/70">
+        © 2024 Accountant Hub. Professional Financial Marketplace.
+      </p>
+    </div>
+    <div class="flex flex-wrap justify-center gap-6 text-sm text-white/70">
+      <span>Privacy Policy</span>
+      <span>Terms of Service</span>
+      <span>Support</span>
+    </div>
+  </div>
+</footer>
+
+<button
+  type="button"
+  (click)="filtersOpen.set(!filtersOpen())"
+  class="fixed bottom-6 right-6 z-20 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg md:hidden"
+  aria-label="Toggle filters"
+>
+  <span class="material-symbols-outlined text-[28px]">filter_list</span>
+</button>

@@ -1,0 +1,30 @@
+<header class="sticky top-0 z-50 border-b border-border bg-background">
+  <nav
+    class="mx-auto flex max-w-[1280px] items-center justify-between px-4 py-3 md:px-12"
+  >
+    <a routerLink="/" class="font-display text-xl font-bold text-secondary md:text-2xl">
+      Accountant Hub
+    </a>
+    <div class="hidden items-center gap-6 md:flex">
+      <a
+        routerLink="/"
+        routerLinkActive="font-bold text-primary border-b-2 border-primary"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="text-on-surface-variant transition-colors hover:text-primary"
+      >
+        Jobs
+      </a>
+      <span class="cursor-not-allowed text-on-surface-variant/60">Login</span>
+      <button
+        type="button"
+        disabled
+        class="rounded-lg bg-primary px-6 py-2 text-sm font-bold text-white opacity-90"
+      >
+        Register
+      </button>
+    </div>
+    <button type="button" class="p-2 text-on-surface md:hidden" aria-label="Menu">
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+  </nav>
+</header>

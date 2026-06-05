@@ -1,0 +1,33 @@
+<div
+  class="flex min-h-[400px] flex-col items-center justify-center rounded-xl border border-border bg-background p-8 text-center md:min-h-[500px] md:p-12"
+>
+  <div class="relative mb-8 flex h-48 w-48 items-center justify-center md:h-64 md:w-64">
+    <div class="absolute inset-0 animate-pulse rounded-full bg-primary/5"></div>
+    <div class="absolute inset-8 rounded-full bg-primary/10"></div>
+    <span class="material-symbols-outlined relative z-10 text-7xl text-primary/30 md:text-8xl"
+      >search_off</span
+    >
+    <span class="material-symbols-outlined absolute right-4 top-4 text-2xl text-primary/30"
+      >description</span
+    >
+    <span class="material-symbols-outlined absolute bottom-8 left-4 text-3xl text-primary/30"
+      >payments</span
+    >
+  </div>
+  <h2 class="font-display mb-3 text-2xl font-semibold text-secondary md:text-3xl">
+    No jobs match your filters
+  </h2>
+  <p class="mb-8 max-w-lg text-base text-on-surface-variant">
+    No jobs match your filters. Try adjusting your search criteria or categories to find more
+    opportunities.
+  </p>
+  <div class="flex flex-col gap-3 sm:flex-row">
+    <button
+      type="button"
+      (click)="clearFilters.emit()"
+      class="rounded-full bg-primary px-8 py-2.5 text-sm font-semibold text-white transition-transform hover:opacity-90 active:scale-95"
+    >
+      Clear All Filters
+    </button>
+  </div>
+</div>
