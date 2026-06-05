@@ -179,6 +179,7 @@
                     </a>
                     <a
                       [routerLink]="['/jobs', bid.jobId, 'my-proposal']"
+                      [queryParams]="{ from: 'my-bids' }"
                       class="inline-flex items-center gap-1 rounded-lg border border-primary px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/5"
                     >
                       <span class="material-symbols-outlined text-base">visibility</span>
@@ -227,6 +228,7 @@
               </a>
               <a
                 [routerLink]="['/jobs', bid.jobId, 'my-proposal']"
+                [queryParams]="{ from: 'my-bids' }"
                 class="inline-flex flex-1 items-center justify-center gap-1 rounded-lg border border-primary px-3 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary/5"
               >
                 <span class="material-symbols-outlined text-base">visibility</span>

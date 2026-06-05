@@ -23,8 +23,18 @@ export class MyProposalComponent implements OnInit {
   readonly error = signal<string | null>(null);
 
   jobId = 0;
+  fromMyBids = false;
+
+  get backLink(): string[] {
+    return this.fromMyBids ? ['/my-bids'] : ['/jobs', this.jobId];
+  }
+
+  get backLabel(): string {
+    return this.fromMyBids ? 'Back to My Bids' : 'Back to Job Details';
+  }
 
   ngOnInit(): void {
+    this.fromMyBids = this.route.snapshot.queryParamMap.get('from') === 'my-bids';
     this.jobId = Number(this.route.snapshot.paramMap.get('id'));
     if (!this.jobId || Number.isNaN(this.jobId)) {
       this.error.set('Invalid job id.');
