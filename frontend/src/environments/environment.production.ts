@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://REPLACE_WITH_RAILWAY_URL'
+  apiUrl: 'https://accountant-hub-production-cc2a.up.railway.app'
 };
