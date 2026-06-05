@@ -26,6 +26,15 @@ export interface JobsApiResponse {
   meta: JobsMeta;
 }
 
+export interface JobDetail extends JobListItem {}
+
+export interface JobDetailApiResponse {
+  success: boolean;
+  message: string;
+  data: JobDetail;
+  meta: null;
+}
+
 export interface JobsQuery {
   search?: string;
   category?: string;

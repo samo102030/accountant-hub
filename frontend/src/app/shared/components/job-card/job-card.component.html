@@ -1,6 +1,6 @@
 @let item = job();
 <article
-  class="job-card-hover relative flex flex-col gap-4 overflow-hidden rounded-xl border border-border bg-background p-6"
+  class="job-card-hover group relative flex flex-col gap-4 overflow-hidden rounded-xl border border-border bg-background p-6"
 >
   <div class="absolute right-0 top-0 p-6">
     <span
@@ -54,13 +54,13 @@
         <span class="block text-xs font-medium uppercase text-on-surface-variant">Bids</span>
         <span class="text-sm font-bold">{{ item.bidCount }} Bidders</span>
       </div>
-      <button
-        type="button"
+      <a
+        [routerLink]="['/jobs', item.id]"
         class="rounded-lg bg-primary p-2 text-white transition-opacity hover:opacity-90"
         aria-label="View job"
       >
         <span class="material-symbols-outlined">chevron_right</span>
-      </button>
+      </a>
     </div>
   </div>
 </article>
