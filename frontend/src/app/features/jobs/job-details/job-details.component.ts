@@ -134,13 +134,4 @@ export class JobDetailsComponent implements OnInit {
   estimatedEarnings(bid: Bid): number {
     return Math.round((bid.proposedPrice - this.serviceFee(bid.proposedPrice)) * 100) / 100;
   }
-
-  showProposal(bid: Bid): void {
-    this.messageService.add({
-      severity: 'info',
-      summary: 'Your proposal',
-      detail: bid.coverLetter,
-      life: 6000
-    });
-  }
 }

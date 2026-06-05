@@ -176,14 +176,13 @@
                   Apply for Job
                 </button>
 
-                <button
-                  type="button"
-                  (click)="showProposal(bid)"
+                <a
+                  [routerLink]="['/jobs', item.id, 'my-proposal']"
                   class="flex w-full items-center justify-center gap-2 rounded-lg border border-primary py-3 text-sm font-semibold text-primary transition-colors hover:bg-primary/5"
                 >
                   <span class="material-symbols-outlined text-xl">visibility</span>
                   View My Proposal
-                </button>
+                </a>
               </div>
 
               <div class="mt-6 space-y-3 border-t border-border pt-6">
