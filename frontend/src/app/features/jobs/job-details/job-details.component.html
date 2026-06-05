@@ -168,15 +168,26 @@
               </div>
             </div>
 
-            <button
-              type="button"
-              disabled
-              class="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 font-display text-base font-semibold text-white opacity-90"
-              title="Login required to apply"
-            >
-              Login to Apply
-              <span class="material-symbols-outlined">login</span>
-            </button>
+            @if (auth.isLoggedIn()) {
+              <button
+                type="button"
+                disabled
+                class="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 font-display text-base font-semibold text-white opacity-90"
+                title="Bidding available in a future update"
+              >
+                Apply
+                <span class="material-symbols-outlined">send</span>
+              </button>
+            } @else {
+              <button
+                type="button"
+                (click)="loginToApply()"
+                class="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 font-display text-base font-semibold text-white transition-opacity hover:opacity-90"
+              >
+                Login to Apply
+                <span class="material-symbols-outlined">login</span>
+              </button>
+            }
             <button
               type="button"
               disabled

@@ -1,0 +1,205 @@
+<app-header />
+
+<main class="relative flex min-h-[calc(100vh-64px)] flex-grow items-center justify-center overflow-hidden bg-background p-4 lg:p-10">
+  <div class="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+    <div
+      class="absolute -left-24 -top-24 h-96 w-96 rounded-full bg-primary/10 opacity-50 blur-3xl"
+    ></div>
+    <div
+      class="absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-primary/5 opacity-50 blur-3xl"
+    ></div>
+  </div>
+
+  <div class="z-10 w-full max-w-lg">
+    <div
+      class="rounded-xl border border-border bg-background p-6 shadow-[0px_4px_20px_rgba(0,0,0,0.05)] md:p-10"
+    >
+      <div class="mb-6 text-center md:text-left">
+        <h1 class="mb-2 font-display text-2xl font-bold text-secondary md:text-3xl">
+          Join the Hub
+        </h1>
+        <p class="text-base text-on-surface-variant">
+          Access the premium marketplace for financial professionals.
+        </p>
+      </div>
+
+      @if (error()) {
+        <div
+          class="mb-4 rounded-lg border border-error/30 bg-error/5 px-4 py-3 text-sm text-error"
+          role="alert"
+        >
+          {{ error() }}
+        </div>
+      }
+
+      <form class="flex flex-col gap-6" [formGroup]="form" (ngSubmit)="submit()">
+        <div class="flex flex-col gap-2">
+          <label
+            class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant"
+            for="fullName"
+            >Full Name</label
+          >
+          <div class="relative">
+            <span
+              class="material-symbols-outlined absolute left-6 top-1/2 -translate-y-1/2 text-on-surface-variant"
+              >person</span
+            >
+            <input
+              id="fullName"
+              type="text"
+              formControlName="fullName"
+              placeholder="John Doe"
+              class="w-full rounded-lg border border-border bg-background py-2 pl-12 pr-6 text-base text-on-surface transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+          @if (form.controls.fullName.touched && form.controls.fullName.errors?.['required']) {
+            <p class="text-xs text-error">Full name is required.</p>
+          }
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label
+            class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant"
+            for="email"
+            >Email Address</label
+          >
+          <div class="relative">
+            <span
+              class="material-symbols-outlined absolute left-6 top-1/2 -translate-y-1/2 text-on-surface-variant"
+              >mail</span
+            >
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              placeholder="john@firm.com"
+              class="w-full rounded-lg border border-border bg-background py-2 pl-12 pr-6 text-base text-on-surface transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+          @if (form.controls.email.touched && form.controls.email.errors?.['required']) {
+            <p class="text-xs text-error">Email is required.</p>
+          }
+          @if (form.controls.email.touched && form.controls.email.errors?.['email']) {
+            <p class="text-xs text-error">Enter a valid email address.</p>
+          }
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div class="flex flex-col gap-2">
+            <label
+              class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant"
+              for="password"
+              >Password</label
+            >
+            <div class="relative">
+              <span
+                class="material-symbols-outlined absolute left-6 top-1/2 -translate-y-1/2 text-on-surface-variant"
+                >lock</span
+              >
+              <input
+                id="password"
+                type="password"
+                formControlName="password"
+                placeholder="••••••••"
+                class="w-full rounded-lg border border-border bg-background py-2 pl-12 pr-6 text-base text-on-surface transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+            @if (form.controls.password.touched && form.controls.password.errors?.['minlength']) {
+              <p class="text-xs text-error">Password must be at least 8 characters.</p>
+            }
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label
+              class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant"
+              for="confirmPassword"
+              >Confirm</label
+            >
+            <div class="relative">
+              <span
+                class="material-symbols-outlined absolute left-6 top-1/2 -translate-y-1/2 text-on-surface-variant"
+                >lock_reset</span
+              >
+              <input
+                id="confirmPassword"
+                type="password"
+                formControlName="confirmPassword"
+                placeholder="••••••••"
+                class="w-full rounded-lg border border-border bg-background py-2 pl-12 pr-6 text-base text-on-surface transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+          </div>
+        </div>
+
+        @if (form.touched && form.errors?.['passwordMismatch']) {
+          <p class="text-xs text-error">Passwords do not match.</p>
+        }
+
+        <div>
+          <label class="group flex cursor-pointer items-start gap-4">
+            <input
+              type="checkbox"
+              formControlName="acceptTerms"
+              class="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary"
+            />
+            <span class="text-sm text-on-surface-variant transition-colors group-hover:text-on-surface">
+              I agree to the
+              <span class="font-bold text-primary">Terms of Service</span>
+              and
+              <span class="font-bold text-primary">Privacy Policy</span>.
+            </span>
+          </label>
+          @if (form.controls.acceptTerms.touched && form.controls.acceptTerms.errors?.['required']) {
+            <p class="mt-1 text-xs text-error">You must accept the terms to register.</p>
+          }
+        </div>
+
+        <button
+          type="submit"
+          [disabled]="submitting()"
+          class="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-6 font-bold text-white transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-70"
+        >
+          @if (submitting()) {
+            <span class="material-symbols-outlined animate-spin">sync</span>
+            Creating Account...
+          } @else {
+            Register Account
+            <span class="material-symbols-outlined">arrow_forward</span>
+          }
+        </button>
+      </form>
+
+      <div class="mt-6 border-t border-border pt-6 text-center">
+        <p class="text-base text-on-surface-variant">
+          Already have an account?
+          <a routerLink="/login" class="font-bold text-primary transition-all hover:underline"
+            >Login</a
+          >
+        </p>
+      </div>
+    </div>
+
+    <p class="mt-6 text-center text-sm text-on-surface-variant">
+      Joined by 2,000+ top financial experts
+    </p>
+  </div>
+</main>
+
+<footer class="border-t border-border bg-inverse-surface">
+  <div
+    class="mx-auto flex max-w-[1200px] flex-col items-center justify-between gap-6 px-4 py-6 md:flex-row md:px-10"
+  >
+    <div class="flex flex-col items-center gap-2 md:items-start">
+      <span class="font-display text-lg font-bold text-white">Accountant Hub</span>
+      <p class="text-sm text-white/70">
+        © 2024 Accountant Hub. Professional Financial Marketplace.
+      </p>
+    </div>
+    <div class="flex flex-wrap justify-center gap-6">
+      <span class="text-xs text-white/70">Privacy Policy</span>
+      <span class="text-xs text-white/70">Terms of Service</span>
+      <span class="text-xs text-white/70">Support</span>
+      <span class="text-xs text-white/70">Contact</span>
+    </div>
+  </div>
+</footer>
