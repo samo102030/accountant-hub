@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace AccountantHub.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
-    public class AddJobDeadline : Migration
+    public partial class AddJobDeadline : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

@@ -1,11 +1,11 @@
-import { DatePipe, UpperCasePipe } from '@angular/common';
+import { UpperCasePipe } from '@angular/common';
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { JobListItem } from '../../../core/models/job.model';
 
 @Component({
   selector: 'app-job-card',
-  imports: [UpperCasePipe, RouterLink, DatePipe],
+  imports: [UpperCasePipe, RouterLink],
   templateUrl: './job-card.component.html'
 })
 export class JobCardComponent {
@@ -18,6 +18,19 @@ export class JobCardComponent {
       return `$${min.toLocaleString()}`;
     }
     return `$${min.toLocaleString()} - $${max.toLocaleString()}`;
+  }
+
+  deadlineLabel(deadline: string | undefined): string | null {
+    if (!deadline) {
+      return null;
+    }
+
+    const due = new Date(deadline);
+    if (Number.isNaN(due.getTime())) {
+      return null;
+    }
+
+    return due.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
   postedLabel(createdAt: string): string {
