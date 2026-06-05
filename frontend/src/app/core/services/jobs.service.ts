@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { JobsApiResponse, JobsQuery } from '../models/job.model';
+import { JobDetailApiResponse, JobsApiResponse, JobsQuery } from '../models/job.model';
 
 @Injectable({ providedIn: 'root' })
 export class JobsService {
@@ -31,5 +31,9 @@ export class JobsService {
     params = params.set('pageSize', (query.pageSize ?? 10).toString());
 
     return this.http.get<JobsApiResponse>(this.baseUrl, { params });
+  }
+
+  getJob(id: number): Observable<JobDetailApiResponse> {
+    return this.http.get<JobDetailApiResponse>(`${this.baseUrl}/${id}`);
   }
 }

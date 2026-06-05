@@ -1,10 +1,11 @@
 import { UpperCasePipe } from '@angular/common';
 import { Component, input } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { JobListItem } from '../../../core/models/job.model';
 
 @Component({
   selector: 'app-job-card',
-  imports: [UpperCasePipe],
+  imports: [UpperCasePipe, RouterLink],
   templateUrl: './job-card.component.html'
 })
 export class JobCardComponent {

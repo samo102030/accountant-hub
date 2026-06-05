@@ -92,4 +92,48 @@ public class JobsController : ControllerBase
             meta = new { total, page, pageSize }
         });
     }
+
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetJob(int id, CancellationToken cancellationToken)
+    {
+        var job = await _db.Jobs
+            .AsNoTracking()
+            .Include(j => j.Category)
+            .Where(j => j.Id == id)
+            .Select(j => new JobDetailDto
+            {
+                Id = j.Id,
+                Title = j.Title,
+                Description = j.Description,
+                CompanyName = j.CompanyName,
+                Category = j.Category.Name,
+                CategorySlug = j.Category.Slug,
+                BudgetMin = j.BudgetMin,
+                BudgetMax = j.BudgetMax,
+                Status = j.Status == JobStatus.Open ? "Open" : "Closed",
+                CreatedAt = j.CreatedAt,
+                Tags = j.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
+                BidCount = j.BidCount
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (job is null)
+        {
+            return NotFound(new
+            {
+                success = false,
+                message = "Job not found",
+                data = (object?)null,
+                meta = (object?)null
+            });
+        }
+
+        return Ok(new
+        {
+            success = true,
+            message = "OK",
+            data = job,
+            meta = (object?)null
+        });
+    }
 }
