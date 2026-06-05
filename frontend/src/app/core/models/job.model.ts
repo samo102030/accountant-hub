@@ -30,6 +30,7 @@ export interface JobsApiResponse {
 }
 
 export interface JobDetail extends JobListItem {
+  expectedDeliveryDays: number;
   userBid?: Bid | null;
 }
 

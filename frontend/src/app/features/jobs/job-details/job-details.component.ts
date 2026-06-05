@@ -110,6 +110,10 @@ export class JobDetailsComponent implements OnInit {
     return `$${avg.toLocaleString()}`;
   }
 
+  deliveryTimeLabel(days: number): string {
+    return `${days} Business Day${days === 1 ? '' : 's'}`;
+  }
+
   loginToApply(): void {
     const returnUrl = this.router.url;
     void this.router.navigate(['/login'], { queryParams: { returnUrl } });

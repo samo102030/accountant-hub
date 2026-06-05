@@ -115,6 +115,8 @@ public class JobsController : ControllerBase
                 BudgetMax = j.BudgetMax,
                 Status = j.Status == JobStatus.Open ? "Open" : "Closed",
                 CreatedAt = j.CreatedAt,
+                Deadline = j.Deadline,
+                ExpectedDeliveryDays = Math.Max(1, (int)Math.Ceiling((j.Deadline - j.CreatedAt).TotalDays)),
                 Tags = j.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
                 BidCount = j.BidCount,
                 UserBid = null
