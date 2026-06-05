@@ -12,6 +12,7 @@ public class JobListItemDto
     public decimal BudgetMax { get; set; }
     public string Status { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
+    public DateTime Deadline { get; set; }
     public IReadOnlyList<string> Tags { get; set; } = Array.Empty<string>();
     public int BidCount { get; set; }
 }

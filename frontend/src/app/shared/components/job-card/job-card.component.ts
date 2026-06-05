@@ -20,9 +20,27 @@ export class JobCardComponent {
     return `$${min.toLocaleString()} - $${max.toLocaleString()}`;
   }
 
+  deadlineLabel(deadline: string | undefined): string | null {
+    if (!deadline) {
+      return null;
+    }
+
+    const due = new Date(deadline);
+    if (Number.isNaN(due.getTime())) {
+      return null;
+    }
+
+    return due.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
   postedLabel(createdAt: string): string {
     const created = new Date(createdAt);
-    const hours = Math.floor((Date.now() - created.getTime()) / (1000 * 60 * 60));
+    const diffMs = Date.now() - created.getTime();
+    const minutes = Math.floor(diffMs / (1000 * 60));
+    if (minutes < 60) {
+      return minutes <= 1 ? 'Posted just now' : `Posted ${minutes}m ago`;
+    }
+    const hours = Math.floor(minutes / 60);
     if (hours < 24) {
       return `Posted ${hours}h ago`;
     }
