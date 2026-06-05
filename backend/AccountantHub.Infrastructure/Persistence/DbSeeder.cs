@@ -33,6 +33,7 @@ public static class DbSeeder
                 BudgetMax = 2500,
                 Status = JobStatus.Open,
                 CreatedAt = now.AddHours(-2),
+                Deadline = now.AddDays(21),
                 Tags = "TAXATION,CORPORATE,Q4 FILING",
                 BidCount = 12
             },
@@ -46,6 +47,7 @@ public static class DbSeeder
                 BudgetMax = 1500,
                 Status = JobStatus.Open,
                 CreatedAt = now.AddHours(-5),
+                Deadline = now.AddDays(14),
                 Tags = "AUDIT,GAAP",
                 BidCount = 5
             },
@@ -59,6 +61,7 @@ public static class DbSeeder
                 BudgetMax = 5500,
                 Status = JobStatus.Open,
                 CreatedAt = now.AddHours(-8),
+                Deadline = now.AddDays(45),
                 Tags = "CONSULTING,STRATEGY",
                 BidCount = 18
             },
@@ -72,6 +75,7 @@ public static class DbSeeder
                 BudgetMax = 600,
                 Status = JobStatus.Open,
                 CreatedAt = now.AddDays(-1),
+                Deadline = now.AddDays(30),
                 Tags = "BOOKKEEPING,RECURRING",
                 BidCount = 24
             },
@@ -85,6 +89,7 @@ public static class DbSeeder
                 BudgetMax = 900,
                 Status = JobStatus.Open,
                 CreatedAt = now.AddDays(-2),
+                Deadline = now.AddDays(10),
                 Tags = "TAXATION,INDIVIDUAL",
                 BidCount = 8
             },
@@ -98,6 +103,7 @@ public static class DbSeeder
                 BudgetMax = 3500,
                 Status = JobStatus.Open,
                 CreatedAt = now.AddDays(-3),
+                Deadline = now.AddDays(28),
                 Tags = "AUDIT,CONTROLS",
                 BidCount = 7
             },
@@ -111,6 +117,7 @@ public static class DbSeeder
                 BudgetMax = 7000,
                 Status = JobStatus.Open,
                 CreatedAt = now.AddDays(-4),
+                Deadline = now.AddDays(60),
                 Tags = "CONSULTING,CFO",
                 BidCount = 11
             },
@@ -124,6 +131,7 @@ public static class DbSeeder
                 BudgetMax = 500,
                 Status = JobStatus.Open,
                 CreatedAt = now.AddDays(-5),
+                Deadline = now.AddDays(7),
                 Tags = "BOOKKEEPING,AP",
                 BidCount = 15
             },
@@ -137,6 +145,7 @@ public static class DbSeeder
                 BudgetMax = 2800,
                 Status = JobStatus.Closed,
                 CreatedAt = now.AddDays(-10),
+                Deadline = now.AddDays(-2),
                 Tags = "TAXATION,SALES TAX",
                 BidCount = 9
             },
@@ -150,6 +159,7 @@ public static class DbSeeder
                 BudgetMax = 1600,
                 Status = JobStatus.Open,
                 CreatedAt = now.AddDays(-6),
+                Deadline = now.AddDays(20),
                 Tags = "AUDIT,NONPROFIT",
                 BidCount = 4
             }

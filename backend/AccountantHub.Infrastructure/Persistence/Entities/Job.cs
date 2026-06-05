@@ -12,6 +12,7 @@ public class Job
     public decimal BudgetMax { get; set; }
     public JobStatus Status { get; set; } = JobStatus.Open;
     public DateTime CreatedAt { get; set; }
+    public DateTime Deadline { get; set; }
     public string Tags { get; set; } = string.Empty;
     public int BidCount { get; set; }
 }

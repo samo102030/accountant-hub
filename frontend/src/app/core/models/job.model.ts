@@ -11,6 +11,7 @@ export interface JobListItem {
   budgetMax: number;
   status: string;
   createdAt: string;
+  deadline: string;
   tags: string[];
   bidCount: number;
 }

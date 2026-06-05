@@ -26,15 +26,19 @@
       >
         {{ item.title }}
       </h3>
-      <p class="text-sm text-on-surface-variant">
-        {{ item.companyName }} • {{ postedLabel(item.createdAt) }}
-      </p>
+      <p class="text-sm font-medium text-on-surface-variant">{{ item.companyName }}</p>
+      <p class="text-xs text-on-surface-variant/80">{{ postedLabel(item.createdAt) }}</p>
     </div>
   </div>
 
   <p class="line-clamp-2 text-sm text-on-surface-variant">{{ item.description }}</p>
 
-  <div class="flex flex-wrap gap-2">
+  <div class="flex flex-wrap items-center gap-2">
+    <span
+      class="rounded-md border border-primary/30 bg-primary/5 px-2 py-1 text-xs font-semibold uppercase text-primary-dark"
+    >
+      {{ item.category }}
+    </span>
     @for (tag of item.tags; track tag) {
       <span
         class="rounded-md border border-border bg-surface px-2 py-1 text-xs font-medium uppercase text-on-surface-variant"
@@ -42,6 +46,11 @@
         {{ tag }}
       </span>
     }
+  </div>
+
+  <div class="flex items-center gap-1 text-xs text-on-surface-variant">
+    <span class="material-symbols-outlined text-base text-primary">event</span>
+    <span>Due {{ item.deadline | date: 'MMM d, y' }}</span>
   </div>
 
   <div class="mt-2 flex items-center justify-between border-t border-border pt-4">
