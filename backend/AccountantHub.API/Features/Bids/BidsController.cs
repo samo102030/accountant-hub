@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using AccountantHub.Infrastructure.Persistence;
 using AccountantHub.Infrastructure.Persistence.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +10,7 @@ namespace AccountantHub.API.Features.Bids;
 
 [ApiController]
 [Route("api/jobs/{jobId:int}/bids")]
-[Authorize]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class BidsController : ControllerBase
 {
     private readonly AppDbContext _db;

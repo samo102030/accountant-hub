@@ -54,7 +54,11 @@ var jwtKey = Environment.GetEnvironmentVariable("JWT_SECRET")
     ?? throw new InvalidOperationException(
         "JWT secret is not configured. Set JWT_SECRET or Jwt:Key.");
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -66,6 +70,23 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "AccountantHub",
             ValidAudience = builder.Configuration["Jwt:Audience"] ?? "AccountantHub",
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnChallenge = async context =>
+            {
+                context.HandleResponse();
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                context.Response.ContentType = "application/json";
+                await context.Response.WriteAsJsonAsync(new
+                {
+                    success = false,
+                    message = "Unauthorized.",
+                    data = (object?)null,
+                    meta = (object?)null
+                });
+            }
         };
     });
 
