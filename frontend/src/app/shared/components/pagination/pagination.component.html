@@ -1,0 +1,38 @@
+<div class="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+  <p class="text-sm text-on-surface-variant">{{ rangeLabel() }}</p>
+  @if (totalPages() > 1) {
+    <div class="flex gap-1">
+      <button
+        type="button"
+        (click)="goTo(page() - 1)"
+        [disabled]="page() <= 1"
+        class="flex h-10 w-10 items-center justify-center rounded-lg border border-border transition-all hover:border-primary disabled:opacity-40"
+        aria-label="Previous page"
+      >
+        <span class="material-symbols-outlined">navigate_before</span>
+      </button>
+      @for (p of pages(); track p) {
+        <button
+          type="button"
+          (click)="goTo(p)"
+          class="flex h-10 w-10 items-center justify-center rounded-lg border font-bold transition-all"
+          [class.bg-primary]="p === page()"
+          [class.text-white]="p === page()"
+          [class.border-border]="p !== page()"
+          [class.hover:bg-surface]="p !== page()"
+        >
+          {{ p }}
+        </button>
+      }
+      <button
+        type="button"
+        (click)="goTo(page() + 1)"
+        [disabled]="page() >= totalPages()"
+        class="flex h-10 w-10 items-center justify-center rounded-lg border border-border transition-all hover:border-primary disabled:opacity-40"
+        aria-label="Next page"
+      >
+        <span class="material-symbols-outlined">navigate_next</span>
+      </button>
+    </div>
+  }
+</div>

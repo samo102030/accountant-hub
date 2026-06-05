@@ -13,20 +13,20 @@ accountant-hub/
 ├── .github/workflows/          # optional CI checks
 ├── frontend/                   # Angular (project name: frontend)
 │   ├── src/app/
-│   │   ├── core/               # auth, interceptor, guards, api config
-│   │   ├── shared/             # job-card, bid-form, pagination, empty-state
+│   │   ├── core/               # services, models, interceptors (Slice 4+)
+│   │   ├── shared/             # job-card, empty-state, pagination, app-header
 │   │   └── features/
-│   │       ├── jobs/           # list + details
-│   │       ├── auth/           # login + register
-│   │       └── my-bids/
+│   │       ├── jobs/           # jobs-list (Slice 2), details (Slice 3)
+│   │       ├── auth/           # login + register (Slice 4)
+│   │       └── my-bids/        # dashboard (Slice 6)
 │   ├── netlify.toml            # publish path must match actual dist/ after build
 │   └── angular.json
 ├── backend/
 │   ├── AccountantHub.API/      # HTTP entry, controllers, DTOs, middleware
 │   │   └── Features/
-│   │       ├── Jobs/
-│   │       ├── Auth/
-│   │       └── Bids/
+│   │       ├── Jobs/           # JobsController, DTOs
+│   │       ├── Auth/           # Slice 4+
+│   │       └── Bids/           # Slice 5+
 │   └── AccountantHub.Infrastructure/
 │       ├── Persistence/        # DbContext, entities, migrations, seed
 │       └── Identity/           # Identity + JWT setup (Slice 4+)
@@ -46,9 +46,9 @@ accountant-hub/
 |------|------|
 | **AccountantHub.API** | Controllers, request/response DTOs, Swagger, CORS, exception middleware, `/api/health` |
 | **AccountantHub.API/Features/** | Group code by feature (Jobs, Auth, Bids) — not separate Application/Domain projects |
-| **AccountantHub.Infrastructure** | EF Core, PostgreSQL, repositories or direct DbContext, Identity, seed data |
-| **frontend/core** | `AuthService`, HTTP interceptor, guards, `environment.apiUrl` |
-| **frontend/shared** | Reusable UI components |
+| **AccountantHub.Infrastructure** | EF Core, PostgreSQL, DbContext, migrations, seed data |
+| **frontend/core** | API services, models; `AuthService`, interceptor, guards in Slice 4+ |
+| **frontend/shared** | Reusable UI: job-card, empty-state, pagination, app-header |
 | **frontend/features** | One folder per page/flow |
 
 ---
@@ -60,6 +60,20 @@ _Updated end of Slice 2, 4, 6._
 | Method | Path | Auth | Slice | Description |
 |--------|------|------|-------|-------------|
 | GET | `/api/health` | No | 1 | Health check |
+| GET | `/api/jobs` | No | 2 | List jobs — query: `search`, `category`, `budgetMin`, `budgetMax`, `sort`, `page`, `pageSize` |
+
+**`GET /api/jobs` response**
+
+```json
+{
+  "success": true,
+  "message": "OK",
+  "data": [ { "id", "title", "description", "companyName", "category", "categorySlug", "budgetMin", "budgetMax", "status", "createdAt", "tags", "bidCount" } ],
+  "meta": { "total", "page", "pageSize" }
+}
+```
+
+**Sort values:** `newest` (default), `budget_asc`, `budget_desc`, `title_asc`
 
 ---
 
@@ -69,7 +83,10 @@ _Updated end of Slice 2, 4, 6._
 
 | Table | Slice | Notes |
 |-------|-------|-------|
-| — | — | — |
+| `Categories` | 2 | `Id`, `Name`, `Slug` — seeded: Taxation, Audit, Consulting, Bookkeeping |
+| `Jobs` | 2 | FK `CategoryId`; budget range, status, tags, `BidCount` (display until Slice 5) |
+
+**Seed (Slice 2):** 4 categories, 10 jobs. Migrations + seed run on API startup when `DATABASE_URL` is set (Railway).
 
 ---
 
@@ -77,4 +94,5 @@ _Updated end of Slice 2, 4, 6._
 
 | Slice | Changes |
 |-------|---------|
-| — | Initial structure (pragmatic 2-project backend) |
+| 1 | Initial structure (pragmatic 2-project backend), health + deploy |
+| 2 | PostgreSQL + EF, jobs API, jobs listing UI (PrimeNG + Tailwind) |
