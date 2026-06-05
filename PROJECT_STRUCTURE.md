@@ -1,8 +1,6 @@
 # Project Structure — Accountant Hub
 
-**Simple modular monolith** — not full Clean Architecture. Enough structure for a clear assessment, no extra layers.
-
-Update **API Endpoints** and **Database Schema** at end of **Slice 2, 4, and 6** only.
+**Simple modular monolith** — API + Infrastructure projects only (no separate Application/Domain layers).
 
 ---
 
@@ -10,31 +8,29 @@ Update **API Endpoints** and **Database Schema** at end of **Slice 2, 4, and 6**
 
 ```
 accountant-hub/
-├── .github/workflows/          # optional CI checks
 ├── frontend/                   # Angular (project name: frontend)
 │   ├── src/app/
 │   │   ├── core/               # services, models, interceptors, guards
 │   │   ├── shared/             # job-card, empty-state, pagination, app-header, bid-form
 │   │   └── features/
-│   │       ├── jobs/           # jobs-list, job-details, bid-submission
+│   │       ├── jobs/           # jobs-list, job-details, bid-submission, my-proposal
 │   │       ├── auth/           # login + register
-│   │       └── my-bids/        # dashboard (Slice 6)
-│   ├── netlify.toml            # publish path must match actual dist/ after build
+│   │       └── my-bids/        # dashboard
+│   ├── netlify.toml
 │   └── angular.json
 ├── backend/
-│   ├── AccountantHub.API/      # HTTP entry, controllers, DTOs, middleware
+│   ├── Dockerfile              # Railway monorepo build
+│   ├── AccountantHub.API/      # HTTP entry, controllers, DTOs
 │   │   └── Features/
-│   │       ├── Jobs/           # JobsController, DTOs
-│   │       ├── Auth/           # AuthController, login/register DTOs
-│   │       └── Bids/           # BidsController, MyBidsController, DTOs
+│   │       ├── Jobs/
+│   │       ├── Auth/
+│   │       └── Bids/
 │   └── AccountantHub.Infrastructure/
-│       ├── Persistence/        # DbContext, entities, migrations, seed
+│       ├── Persistence/        # DbContext, entities, migrations, seed, DemoUserSeeder
 │       └── Identity/           # Identity + JWT token service
-├── docs/
-│   └── slice-reports/          # SLICE-01.md … SLICE-06.md (one per completed slice)
 ├── TECH_STACK.md
 ├── PROJECT_STRUCTURE.md
-├── accountant-hub-prompt.md
+├── global.json
 └── README.md
 ```
 
@@ -44,29 +40,27 @@ accountant-hub/
 
 | Part | Role |
 |------|------|
-| **AccountantHub.API** | Controllers, request/response DTOs, Swagger, CORS, exception middleware, `/api/health` |
-| **AccountantHub.API/Features/** | Group code by feature (Jobs, Auth, Bids) — not separate Application/Domain projects |
-| **AccountantHub.Infrastructure** | EF Core, PostgreSQL, DbContext, migrations, seed data |
-| **Infrastructure/Identity** | ASP.NET Identity registration, JWT token generation |
-| **frontend/core** | API services, models; `AuthService`, `BidsService`, `JobsService`, interceptor, guards |
-| **frontend/shared** | Reusable UI: job-card, empty-state, pagination, app-header, bid-form |
+| **AccountantHub.API** | Controllers, DTOs, Swagger, CORS, `/api/health` |
+| **AccountantHub.API/Features/** | Jobs, Auth, Bids grouped by feature |
+| **AccountantHub.Infrastructure** | EF Core, PostgreSQL, migrations, job + demo user seed |
+| **Infrastructure/Identity** | ASP.NET Identity, JWT generation |
+| **frontend/core** | `JobsService`, `BidsService`, `AuthService`, interceptor, guards |
+| **frontend/shared** | job-card, bid-form, pagination, empty-state, app-header |
 | **frontend/features** | One folder per page/flow |
 
 ---
 
 ## API Endpoints
 
-_Updated end of Slice 6._
-
-| Method | Path | Auth | Slice | Description |
-|--------|------|------|-------|-------------|
-| GET | `/api/health` | No | 1 | Health check |
-| GET | `/api/jobs` | No | 2 | List jobs — query: `search`, `category`, `budgetMin`, `budgetMax`, `sort`, `page`, `pageSize` |
-| GET | `/api/jobs/{id}` | Optional JWT | 3/5 | Single job; `data.userBid` when Bearer token present |
-| POST | `/api/auth/register` | No | 4 | Register accountant — returns JWT |
-| POST | `/api/auth/login` | No | 4 | Login — returns JWT |
-| POST | `/api/jobs/{id}/bids` | JWT | 5 | Submit bid — body: `proposedPrice`, `deliveryDays`, `coverLetter`, `experienceSummary` |
-| GET | `/api/my-bids` | JWT | 6 | Current user's bids — query: `page`, `pageSize` |
+| Method | Path | Auth | Module | Description |
+|--------|------|------|--------|-------------|
+| GET | `/api/health` | No | Core | Health check |
+| GET | `/api/jobs` | No | Jobs | List — `search`, `category`, `budgetMin`, `budgetMax`, `sort`, `page`, `pageSize` |
+| GET | `/api/jobs/{id}` | Optional JWT | Jobs | Detail; `deadline`, `expectedDeliveryDays`; `userBid` when Bearer present |
+| POST | `/api/auth/register` | No | Auth | Register — returns JWT |
+| POST | `/api/auth/login` | No | Auth | Login — returns JWT |
+| POST | `/api/jobs/{id}/bids` | JWT | Bids | Submit bid |
+| GET | `/api/my-bids` | JWT | Bids | Current user's bids — `page`, `pageSize` |
 
 **`GET /api/jobs` response**
 
@@ -74,12 +68,17 @@ _Updated end of Slice 6._
 {
   "success": true,
   "message": "OK",
-  "data": [ { "id", "title", "description", "companyName", "category", "categorySlug", "budgetMin", "budgetMax", "status", "createdAt", "tags", "bidCount" } ],
+  "data": [
+    {
+      "id", "title", "description", "companyName", "category", "categorySlug",
+      "budgetMin", "budgetMax", "status", "createdAt", "deadline", "tags", "bidCount"
+    }
+  ],
   "meta": { "total", "page", "pageSize" }
 }
 ```
 
-**`GET /api/jobs/{id}` response** — job fields in `data`; optional `userBid` object when authenticated; `meta` is `null`.
+**`GET /api/jobs/{id}` response** — includes `deadline`, `expectedDeliveryDays` (computed from deadline − createdAt); optional `userBid` when authenticated.
 
 **`GET /api/my-bids` response**
 
@@ -97,70 +96,37 @@ _Updated end of Slice 6._
 }
 ```
 
-Bid `status` is derived: `Pending` when job is Open, `Closed` when job is Closed (no accept/reject workflow).
-
-**`POST /api/jobs/{id}/bids` success**
-
-```json
-{
-  "success": true,
-  "message": "Bid submitted successfully.",
-  "data": { "id", "jobId", "proposedPrice", "deliveryDays", "coverLetter", "experienceSummary", "createdAt" },
-  "meta": null
-}
-```
-
-**Bid errors:** **400** validation / closed job, **401** unauthorized, **409** duplicate bid.
-
-**`POST /api/auth/register` / `POST /api/auth/login` success**
-
-```json
-{
-  "success": true,
-  "message": "OK",
-  "data": { "token", "email", "fullName" },
-  "meta": null
-}
-```
-
-**Auth errors:** **400** validation, **401** invalid login, **409** duplicate email on register.
+Bid `status` is derived: `Pending` when job is Open, `Closed` when job is Closed.
 
 **Sort values:** `newest` (default), `budget_asc`, `budget_desc`, `title_asc`
-
-**Swagger:** Bearer JWT — use **Authorize** with `Bearer <token>` for protected endpoints.
 
 ---
 
 ## Database Schema
 
-_Updated end of Slice 6._
+| Table | Notes |
+|-------|-------|
+| `Categories` | `Id`, `Name`, `Slug` — Taxation, Audit, Consulting, Bookkeeping |
+| `Jobs` | FK `CategoryId`; `BudgetMin`/`BudgetMax`, `Status`, `Tags`, `BidCount`, `Deadline`, `CreatedAt` |
+| `Bids` | FK `JobId`, `UserId`; unique `(UserId, JobId)`; price, delivery, cover letter, experience |
+| `AspNetUsers` | Identity — `FullName`, `Email`, etc. |
+| `AspNetRoles` + related Identity tables | Standard ASP.NET Identity schema |
 
-| Table | Slice | Notes |
-|-------|-------|-------|
-| `Categories` | 2 | `Id`, `Name`, `Slug` — seeded: Taxation, Audit, Consulting, Bookkeeping |
-| `Jobs` | 2 | FK `CategoryId`; budget range, status (`Open`/`Closed`), tags, `BidCount` |
-| `Bids` | 5 | FK `JobId`, `UserId`; unique index `(UserId, JobId)`; price, delivery, cover letter, experience |
-| `AspNetUsers` | 4 | Identity user — `FullName`, `Email`, `PasswordHash`, etc. |
-| `AspNetRoles` | 4 | Identity roles (default schema) |
-| `AspNetUserRoles` | 4 | User–role mapping |
-| `AspNetUserClaims` | 4 | Per-user claims |
-| `AspNetRoleClaims` | 4 | Per-role claims |
-| `AspNetUserLogins` | 4 | External logins (unused) |
-| `AspNetUserTokens` | 4 | Identity tokens |
+**Seed on startup:** 4 categories, up to 40 jobs, demo user `demo@accountanthub.com` (if not exists).
 
-**Seed (Slice 2):** 4 categories, 10 jobs. Migrations + seed run on API startup when `DATABASE_URL` is set (Railway).
-
-**Auth (Slice 4):** JWT secret via Railway env `JWT_SECRET` (not in git). Access token lifetime **24 hours**. Client stores token in `localStorage`.
+**Auth:** JWT via Railway `JWT_SECRET` (not in git). 24h access token; client uses `localStorage`.
 
 ---
 
 ## Changelog
 
-| Slice | Changes |
+| Phase | Changes |
 |-------|---------|
-| 1 | Initial structure (pragmatic 2-project backend), health + deploy |
-| 2 | PostgreSQL + EF, jobs API, jobs listing UI (PrimeNG + Tailwind) |
-| 3 | Job details API + page |
-| 4 | ASP.NET Identity + JWT auth, login/register UI, interceptor, guards, header logout |
-| 5 | Bids table + POST bid API, bid form, already-bid state on job details |
-| 6 | GET `/api/my-bids`, My Bids dashboard, navbar mobile menu, jobs pagination polish, README |
+| Foundation | Monorepo, health API, Angular shell, Netlify + Railway deploy |
+| Jobs | PostgreSQL, EF migrations, jobs API, listing UI (filters, pagination) |
+| Job details | Single job API, details page, attachment placeholders |
+| Auth | Identity + JWT, login/register, guards, interceptor |
+| Bids | Bids table, submit bid API, bid form, already-bid state |
+| Dashboard | My Bids API + UI, mobile nav, jobs polish |
+| Task compliance | Job `Deadline`, category on cards, delivery/deadline on details |
+| My Proposal | Read-only proposal page, My Bids navigation links |

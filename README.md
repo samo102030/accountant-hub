@@ -1,51 +1,61 @@
 # Accountant Hub
 
-A job marketplace for accountants — browse seeded accounting jobs, view details, register/login, submit bids, and track proposals on a **My Bids** dashboard.
+A job marketplace where accountants browse accounting jobs, view details, submit bids, and track proposals on a **My Bids** dashboard.
 
-Built as a **48-hour assessment** project: working features, live deploy, clean readable code — not a full production product.
+Companies post jobs via seeded data only — there is no client “Post Job” flow in this build.
 
-## Live URLs
+## Deliverables
 
-| Service | URL |
-|---------|-----|
-| **Frontend (Netlify)** | Deploy from `main` — confirm URL in your Netlify dashboard |
-| **API (Railway)** | https://accountant-hub-production-cc2a.up.railway.app |
-| **Swagger UI** | https://accountant-hub-production-cc2a.up.railway.app/swagger |
+| Item | URL |
+|------|-----|
+| **GitHub** | https://github.com/samo102030/accountant-hub |
+| **Live demo (Netlify)** | https://accountant-hub.netlify.app/ |
+| **API / Swagger** | https://accountant-hub-production-cc2a.up.railway.app/swagger |
 
-## Test credentials
+**Test login:** `demo@accountanthub.com` / `DemoPass123!`
 
-No pre-seeded users. Register an accountant on the live site or via API:
+The demo accountant is created automatically on API startup if it does not already exist.
 
-```bash
-curl -X POST https://accountant-hub-production-cc2a.up.railway.app/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"fullName":"Demo Accountant","email":"demo@firm.com","password":"DemoPass123"}'
-```
+## Project overview
 
-Then login with the same email/password. Use the returned JWT for protected endpoints (bid submit, My Bids).
+Accountant Hub is a full-stack web app for accountants to:
 
-**Sample seeded jobs:** 10 jobs across 4 categories (Taxation, Audit, Consulting, Bookkeeping). Job id **9** is **Closed** (cannot bid).
+- Browse and filter open accounting jobs (search, category, budget, sort, pagination)
+- View job details (description, skills/tags, budget, deadline, expected delivery, bid count)
+- Register, login, and logout
+- Submit one bid per job (proposed price, delivery days, cover letter, experience summary)
+- View a read-only **My Proposal** page after bidding (`/jobs/:id/my-proposal`)
+- Track all submissions on **My Bids**
 
-## Why this stack
+**Seeded data:** 40 jobs across 4 categories (Taxation, Audit, Consulting, Bookkeeping). Some jobs are **Closed** and do not accept new bids.
 
-| Layer | Choice | Rationale |
-|-------|--------|-----------|
-| **Frontend** | Angular 21 (standalone) | Structured SPA, strong forms/guards for auth flows |
-| **UI** | PrimeNG + Tailwind | Accessible controls + layout tokens; Stitch HTML guides (local) for visual reference |
-| **Backend** | **.NET 8 LTS** Web API | Stable LTS on Railway, Swashbuckle/Swagger out of the box |
-| **Database** | PostgreSQL (Railway) | Relational fit for jobs, categories, bids, unique (user, job) |
-| **Auth** | ASP.NET Identity + JWT | Standard for .NET; 24h bearer tokens, no cookie redirect issues |
-| **Deploy** | Netlify + Railway | Zero-config static + API hosting from GitHub |
+## Tech stack
 
-**Scope note:** UI follows the local **Stitch** design system (not committed). Jobs are **database-seeded** — there is no client “Post Job” flow; companies posting jobs is narrative only.
+| Layer | Choice |
+|-------|--------|
+| **Frontend** | Angular 21 (standalone), PrimeNG, Tailwind CSS 4, Material Symbols Outlined |
+| **Backend** | .NET 8 LTS Web API, EF Core, PostgreSQL |
+| **Auth** | ASP.NET Identity + JWT (24h bearer token, `localStorage` on client) |
+| **Deploy** | Netlify (frontend) + Railway (API + PostgreSQL) |
+
+Pinned package versions: [TECH_STACK.md](./TECH_STACK.md).
+
+### Why Angular + .NET instead of React/Laravel?
+
+Common alternatives include React/Laravel. This implementation uses **Angular 21** and **.NET 8 LTS** because:
+
+- **Angular** — structured SPA with strong forms, routing guards, and interceptors for JWT flows
+- **.NET 8 LTS** — stable long-term support, first-class Swagger, Identity + JWT on Railway
+- **PostgreSQL** — relational model fits jobs, categories, bids, and unique (user, job) constraints
 
 ## Features
 
-- **Jobs listing** — search, category/budget filters, sort, pagination, empty state when no matches
-- **Job details** — full description, skills, budget, bid count; Login to Apply when logged out
-- **Bid submission** — one bid per user per job; already-bid and closed-job states
+- **Jobs listing** — category and deadline on each card, posted date, bid count, Open/Closed status, filters, sort, pagination, empty state
+- **Job details** — full description, company, category, skills (tags), budget, expected delivery days, deadline, attachment placeholders, bid count
+- **Bid submission** — authenticated form; duplicate bid blocked (409); closed jobs blocked
+- **My Proposal** — read-only view of submitted bid (no edit/withdraw)
+- **My Bids** — dashboard with stats; links to job details and my proposal
 - **Auth** — register, login, logout (client-side token clear)
-- **My Bids** — dashboard of submitted proposals with stats (JWT required)
 
 ## API endpoints
 
@@ -53,7 +63,7 @@ Then login with the same email/password. Use the returned JWT for protected endp
 |--------|------|------|-------------|
 | GET | `/api/health` | No | Health check |
 | GET | `/api/jobs` | No | List jobs — `search`, `category`, `budgetMin`, `budgetMax`, `sort`, `page`, `pageSize` |
-| GET | `/api/jobs/{id}` | Optional JWT | Job detail; `data.userBid` when authenticated |
+| GET | `/api/jobs/{id}` | Optional JWT | Job detail; includes `deadline`, `expectedDeliveryDays`; `data.userBid` when authenticated |
 | POST | `/api/auth/register` | No | Register — `fullName`, `email`, `password` (min 8) |
 | POST | `/api/auth/login` | No | Login — `email`, `password` |
 | POST | `/api/jobs/{id}/bids` | JWT | Submit bid |
@@ -63,28 +73,48 @@ Then login with the same email/password. Use the returned JWT for protected endp
 
 **Sort values:** `newest` (default), `budget_asc`, `budget_desc`, `title_asc`
 
+**Frontend routes (selected):** `/`, `/jobs/:id`, `/jobs/:id/bid`, `/jobs/:id/my-proposal`, `/my-bids`, `/login`, `/register`
+
 Authorize in Swagger with `Bearer <token>` for protected routes.
 
-## Local setup
+## Setup instructions
 
 ### Prerequisites
 
 - Node.js 22 LTS
 - .NET 8 SDK
-- PostgreSQL (local or Railway `DATABASE_URL`)
+- PostgreSQL (local instance or Railway `DATABASE_URL`)
 
 ### Backend
 
 ```bash
 cd backend/AccountantHub.API
+```
+
+**Option A — local Development config** (gitignored `appsettings.Development.json` with Postgres + JWT for dev):
+
+```bash
+dotnet run
+```
+
+**Option B — user secrets** (if not using Development config):
+
+```bash
 dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=accountant_hub;Username=postgres;Password=yourpassword"
 dotnet user-secrets set "Jwt:Key" "your-local-dev-secret-at-least-32-chars-long"
 dotnet run
 ```
 
+**Option C — Railway database locally:**
+
+```bash
+# set DATABASE_URL to your Railway public Postgres URL
+dotnet run
+```
+
 API: http://localhost:5080 — Swagger: http://localhost:5080/swagger
 
-Migrations and seed run on startup when the database is reachable.
+On startup the API runs migrations, seeds categories/jobs (up to 40), and creates the demo user if missing.
 
 ### Frontend
 
@@ -103,9 +133,18 @@ cd frontend && npm run build    # output: dist/frontend/browser
 cd backend && dotnet build
 ```
 
+### Production environment (Railway)
+
+Set on the API service:
+
+- `DATABASE_URL` — PostgreSQL connection (from Railway plugin)
+- `JWT_SECRET` — at least 32 characters
+
+After deploy, restart the API once so migrations, job seed, and demo user seed run.
+
 ## Security
 
-- **Secrets** (`JWT_SECRET`, `DATABASE_URL`) live only in Railway env vars or `dotnet user-secrets` — never in git
+- **Secrets** (`JWT_SECRET`, `DATABASE_URL`) live only in Railway env vars, local `appsettings.Development.json` (gitignored), or `dotnet user-secrets` — never committed to git
 - JWT access tokens: **24 hours**, stored in `localStorage` on the client
 - CORS: `localhost:4200` and `*.netlify.app`
 - Global exception handler hides stack traces in production
@@ -113,13 +152,14 @@ cd backend && dotnet build
 
 ## Project layout
 
-See [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md) for folder map, schema, and slice changelog.
-
-Slice completion reports: [docs/slice-reports/](./docs/slice-reports/).
+See [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md) for folder map, schema, and API details.
 
 ## Assumptions
 
-- **Accountant-facing only** — no company/admin auth or job posting UI
-- **Bid status** on My Bids is derived from job state (`Pending` / `Closed`); no accept/reject workflow in scope
-- **Attachments** on job details are placeholder only
+- **Accountant-facing only** — no company/admin auth or job posting UI; jobs are database-seeded
+- **One bid per user per job** — enforced by unique index and API (409 on duplicate)
+- **Bid status** on My Bids is derived from job state (`Pending` when job is Open, `Closed` when job is Closed); no accept/reject workflow
+- **My Proposal** is read-only — no edit or withdraw after submit
+- **Attachments** on job details are UI placeholders only (no file upload or storage)
+- **`expectedDeliveryDays`** on job detail is computed from `deadline` and `createdAt` in the API (not a separate database column)
 - **English only** in UI templates

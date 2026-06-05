@@ -433,7 +433,10 @@ FodyWeavers.xsd
 # Local-only (never commit)
 stitch/
 .cursor/
-Vibe Coder _ Solo Full-Stack Developer.md
+VibeCoder _ Solo Full-Stack Developer.md
+accountant-hub-prompt.md
+docs/slice-reports/
+frontend/README.md
 
 # Secrets & local config
 .env

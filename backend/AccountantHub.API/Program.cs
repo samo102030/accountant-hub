@@ -1,6 +1,8 @@
 using System.Text;
 using AccountantHub.Infrastructure;
 using AccountantHub.Infrastructure.Persistence;
+using AccountantHub.Infrastructure.Persistence.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -111,8 +113,10 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     db.Database.Migrate();
     await DbSeeder.SeedAsync(db);
+    await DemoUserSeeder.SeedAsync(userManager);
 }
 
 app.UseSwagger();
