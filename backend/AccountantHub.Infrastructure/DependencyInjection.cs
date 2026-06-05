@@ -1,3 +1,4 @@
+using AccountantHub.Infrastructure.Identity;
 using AccountantHub.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +11,8 @@ public static class DependencyInjection
     {
         services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(connectionString));
+
+        services.AddIdentityServices();
 
         return services;
     }

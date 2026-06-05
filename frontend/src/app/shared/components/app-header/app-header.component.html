@@ -14,14 +14,29 @@
       >
         Jobs
       </a>
-      <span class="cursor-not-allowed text-on-surface-variant/60">Login</span>
-      <button
-        type="button"
-        disabled
-        class="rounded-lg bg-primary px-6 py-2 text-sm font-bold text-white opacity-90"
-      >
-        Register
-      </button>
+      @if (isLoggedIn()) {
+        <span class="text-sm text-on-surface-variant">{{ user()?.fullName }}</span>
+        <button
+          type="button"
+          (click)="logout()"
+          class="text-sm font-semibold text-on-surface-variant transition-colors hover:text-primary"
+        >
+          Logout
+        </button>
+      } @else {
+        <a
+          routerLink="/login"
+          class="text-on-surface-variant transition-colors hover:text-primary"
+        >
+          Login
+        </a>
+        <a
+          routerLink="/register"
+          class="rounded-lg bg-primary px-6 py-2 text-sm font-bold text-white transition-opacity hover:opacity-90"
+        >
+          Register
+        </a>
+      }
     </div>
     <button type="button" class="p-2 text-on-surface md:hidden" aria-label="Menu">
       <span class="material-symbols-outlined">menu</span>

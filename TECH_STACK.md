@@ -65,6 +65,9 @@ Material Symbols: Google Fonts (Outlined)
 EF Core:          8.0.11
 Npgsql EF:        8.0.11
 PostgreSQL:       Railway-managed (Slice 2+)
+Identity EF:      8.0.11
+JWT Bearer:       8.0.11
+System.IdentityModel.Tokens.Jwt: 8.0.2
 ```
 
 Note: Angular CLI 22 requires Node ≥22.22.3; this repo uses Angular 21 on Node 22.22.0.
