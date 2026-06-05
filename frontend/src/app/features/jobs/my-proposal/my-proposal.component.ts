@@ -26,7 +26,7 @@ export class MyProposalComponent implements OnInit {
   fromMyBids = false;
 
   get backLink(): string[] {
-    return this.fromMyBids ? ['/my-bids'] : ['/jobs', this.jobId];
+    return this.fromMyBids ? ['/my-bids'] : ['/jobs', String(this.jobId)];
   }
 
   get backLabel(): string {
