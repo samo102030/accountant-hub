@@ -2,7 +2,6 @@ import { DatePipe, UpperCasePipe } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MessageService } from 'primeng/api';
-import { Toast } from 'primeng/toast';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { AppHeaderComponent } from '../../../shared/components/app-header/app-header.component';
 import { AuthService } from '../../../core/services/auth.service';
@@ -24,10 +23,8 @@ interface AttachmentPlaceholder {
     DatePipe,
     UpperCasePipe,
     ProgressSpinner,
-    Toast,
     AppHeaderComponent
   ],
-  providers: [MessageService],
   templateUrl: './job-details.component.html'
 })
 export class JobDetailsComponent implements OnInit {
@@ -78,12 +75,19 @@ export class JobDetailsComponent implements OnInit {
     this.loadJob(id);
 
     if (this.route.snapshot.queryParamMap.get('bidSubmitted') === 'true') {
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Bid submitted',
-        detail: 'Your proposal was submitted successfully.',
-        life: 4000
+      const detail =
+        (history.state?.['bidSuccessMessage'] as string | undefined) ??
+        'Your proposal was submitted successfully.';
+
+      queueMicrotask(() => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Bid submitted',
+          detail,
+          life: 4000
+        });
       });
+
       void this.router.navigate([], {
         relativeTo: this.route,
         queryParams: { bidSubmitted: null },

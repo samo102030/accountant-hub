@@ -1,7 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { MessageService } from 'primeng/api';
-import { Toast } from 'primeng/toast';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { AppHeaderComponent } from '../../../shared/components/app-header/app-header.component';
 import { BidFormComponent } from '../../../shared/components/bid-form/bid-form.component';
@@ -15,11 +13,9 @@ import { JobDetail } from '../../../core/models/job.model';
   imports: [
     RouterLink,
     ProgressSpinner,
-    Toast,
     AppHeaderComponent,
     BidFormComponent
   ],
-  providers: [MessageService],
   templateUrl: './bid-submission.component.html'
 })
 export class BidSubmissionComponent implements OnInit {
@@ -27,7 +23,6 @@ export class BidSubmissionComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly jobsService = inject(JobsService);
   private readonly bidsService = inject(BidsService);
-  private readonly messageService = inject(MessageService);
 
   readonly job = signal<JobDetail | null>(null);
   readonly loading = signal(true);
@@ -54,9 +49,7 @@ export class BidSubmissionComponent implements OnInit {
           return;
         }
         if (job.userBid) {
-          void this.router.navigate(['/jobs', this.jobId], {
-            queryParams: { bidSubmitted: 'true' }
-          });
+          void this.router.navigate(['/jobs', this.jobId]);
           return;
         }
         this.job.set(job);
@@ -85,14 +78,9 @@ export class BidSubmissionComponent implements OnInit {
     this.bidsService.submitBid(this.jobId, request).subscribe({
       next: (res) => {
         this.submitting.set(false);
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Bid submitted',
-          detail: res.message || 'Your proposal was submitted successfully.',
-          life: 4000
-        });
         void this.router.navigate(['/jobs', this.jobId], {
-          queryParams: { bidSubmitted: 'true' }
+          queryParams: { bidSubmitted: 'true' },
+          state: { bidSuccessMessage: res.message }
         });
       },
       error: (err) => {
