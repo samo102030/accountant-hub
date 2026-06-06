@@ -154,6 +154,16 @@ After deploy, restart the API once so migrations, job seed, and demo user seed r
 
 See [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md) for folder map, schema, and API details.
 
+## Technology Stack Decision
+
+The assessment allowed the use of an alternative technology stack when justified.
+
+For this submission, I chose Angular, ASP.NET Core (.NET 8), and PostgreSQL because they represent my primary professional stack and the technologies I have the most production experience with.
+
+Given the limited assessment timeframe, this allowed me to focus on delivering a complete, well-tested, deployed solution with proper documentation, deployment pipelines, and business requirements coverage, rather than spending time adapting to a different stack.
+
+The decision was made to maximize delivery quality, maintainability, and overall completeness within the available time while remaining fully aligned with the assessment requirements.
+
 ## Assumptions
 
 - **Accountant-facing only** — no company/admin auth or job posting UI; jobs are database-seeded
