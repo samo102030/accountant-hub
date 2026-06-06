@@ -40,13 +40,21 @@ Accountant Hub is a full-stack web app for accountants to:
 
 Pinned package versions: [TECH_STACK.md](./TECH_STACK.md).
 
-### Why Angular + .NET instead of React/Laravel?
+## Technology Stack Decision
 
-Common alternatives include React/Laravel. This implementation uses **Angular 21** and **.NET 8 LTS** because:
+The assessment allowed the use of an alternative technology stack when justified.
+For this submission, I chose **Angular 21**, **ASP.NET Core (.NET 8)**, and
+**PostgreSQL** — my primary professional stack and the technologies I have the most
+production experience with.
 
-- **Angular** — structured SPA with strong forms, routing guards, and interceptors for JWT flows
-- **.NET 8 LTS** — stable long-term support, first-class Swagger, Identity + JWT on Railway
-- **PostgreSQL** — relational model fits jobs, categories, bids, and unique (user, job) constraints
+Working within the limited timeframe, this let me focus on delivering a complete,
+well-tested, and deployed solution — with proper documentation, deployment pipelines,
+and full business-requirements coverage — rather than spending time adapting to an
+unfamiliar stack. Beyond familiarity, the stack also fits the problem well:
+
+- **Angular** — structured SPA with strong forms, routing guards, and JWT interceptors
+- **.NET 8 LTS** — long-term support, first-class Swagger, and built-in Identity + JWT
+- **PostgreSQL** — relational model fits jobs, categories, bids, and the unique (user, job) constraint
 
 ## Features
 
@@ -153,16 +161,6 @@ After deploy, restart the API once so migrations, job seed, and demo user seed r
 ## Project layout
 
 See [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md) for folder map, schema, and API details.
-
-## Technology Stack Decision
-
-The assessment allowed the use of an alternative technology stack when justified.
-
-For this submission, I chose Angular, ASP.NET Core (.NET 8), and PostgreSQL because they represent my primary professional stack and the technologies I have the most production experience with.
-
-Given the limited assessment timeframe, this allowed me to focus on delivering a complete, well-tested, deployed solution with proper documentation, deployment pipelines, and business requirements coverage, rather than spending time adapting to a different stack.
-
-The decision was made to maximize delivery quality, maintainability, and overall completeness within the available time while remaining fully aligned with the assessment requirements.
 
 ## Assumptions
 
